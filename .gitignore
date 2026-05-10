@@ -1,0 +1,22 @@
+# Build outputs
+04_Source/artifacts/
+*.exe
+06_Build-Release/*.exe
+06_Build-Release/logs/
+
+# Logs and temporary files
+09_Logs/
+*.log
+*.tmp
+*.temp
+
+# Local backups and scratch files
+10_Backups/
+
+# Editor and OS metadata
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
+desktop.ini
