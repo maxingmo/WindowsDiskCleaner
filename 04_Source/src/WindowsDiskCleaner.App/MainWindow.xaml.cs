@@ -10,7 +10,7 @@ namespace WindowsDiskCleaner.App
     {
         public MainWindow()
         {
-            Title = "File Scanner P3 - Risk Levels";
+            Title = "File Scanner P4 - Safe Delete";
             Width = 1240;
             Height = 720;
             MinWidth = 980;
@@ -50,6 +50,7 @@ namespace WindowsDiskCleaner.App
             toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
             toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
             toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
+            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
             Grid.SetRow(toolbar, 1);
             root.Children.Add(toolbar);
 
@@ -68,6 +69,7 @@ namespace WindowsDiskCleaner.App
             AddToolbarButton(toolbar, "\u9009\u62e9\u76ee\u5f55", "BrowseCommand", 1);
             AddToolbarButton(toolbar, "\u5f00\u59cb\u626b\u63cf", "ScanCommand", 2);
             AddToolbarButton(toolbar, "\u53d6\u6d88", "CancelCommand", 3);
+            AddToolbarButton(toolbar, "\u5220\u9664\u6587\u4ef6", "DeleteSelectedCommand", 4);
 
             var filters = BuildFilterBar();
             Grid.SetRow(filters, 2);
@@ -84,6 +86,11 @@ namespace WindowsDiskCleaner.App
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal
             };
             grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("Files"));
+            grid.SetBinding(DataGrid.SelectedItemProperty, new Binding("SelectedFile")
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u540d", Binding = new Binding("Name"), Width = 190 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u7ea7\u522b", Binding = new Binding("RiskLevelDisplay"), Width = 120 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u5927\u5c0f", Binding = new Binding("SizeDisplay"), SortMemberPath = "SizeBytes", Width = 100 });
@@ -215,4 +222,3 @@ namespace WindowsDiskCleaner.App
         }
     }
 }
-

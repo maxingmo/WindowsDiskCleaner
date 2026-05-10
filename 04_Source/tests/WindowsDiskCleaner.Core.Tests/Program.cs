@@ -27,7 +27,12 @@ namespace WindowsDiskCleaner.Core.Tests
                 RiskClassifierMarksProgramFilesAsProgramInstall,
                 RiskClassifierMarksUserKnownFoldersAsUserData,
                 RiskClassifierMarksCacheAndLogsAsTemporary,
-                RiskClassifierMarksUnknownPathsAsCaution
+                RiskClassifierMarksUnknownPathsAsCaution,
+                DeleteServiceRejectsUnconfirmedNormalFile,
+                DeleteServiceDeletesConfirmedNormalFile,
+                DeleteServiceRequiresHighRiskConfirmation,
+                DeleteServiceDeletesHighRiskFileAfterSecondConfirmation,
+                DeleteServiceReturnsFailureWhenAdapterThrows
             };
 
             var failed = 0;
@@ -279,6 +284,67 @@ namespace WindowsDiskCleaner.Core.Tests
             AssertEqual(FileRiskLevel.UnknownCaution, result.Level, "risk level");
         }
 
+        private static void DeleteServiceRejectsUnconfirmedNormalFile()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileDeletionService(adapter);
+            var entry = new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg");
+
+            var result = service.DeleteToRecycleBin(entry, FileDeleteConfirmation.NotConfirmed);
+
+            AssertTrue(!result.Succeeded, "delete should fail");
+            AssertEqual(0, adapter.CallCount, "adapter calls");
+        }
+
+        private static void DeleteServiceDeletesConfirmedNormalFile()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileDeletionService(adapter);
+            var entry = new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg");
+
+            var result = service.DeleteToRecycleBin(entry, FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(result.Succeeded, "delete should succeed");
+            AssertEqual(1, adapter.CallCount, "adapter calls");
+            AssertEqual(entry.FullPath, adapter.LastPath, "deleted path");
+        }
+
+        private static void DeleteServiceRequiresHighRiskConfirmation()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileDeletionService(adapter);
+            var entry = new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll");
+
+            var result = service.DeleteToRecycleBin(entry, FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(!result.Succeeded, "delete should fail");
+            AssertEqual(0, adapter.CallCount, "adapter calls");
+        }
+
+        private static void DeleteServiceDeletesHighRiskFileAfterSecondConfirmation()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileDeletionService(adapter);
+            var entry = new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll");
+
+            var result = service.DeleteToRecycleBin(entry, FileDeleteConfirmation.HighRiskConfirmed);
+
+            AssertTrue(result.Succeeded, "delete should succeed");
+            AssertEqual(1, adapter.CallCount, "adapter calls");
+        }
+
+        private static void DeleteServiceReturnsFailureWhenAdapterThrows()
+        {
+            var adapter = new FakeDeleteAdapter { ThrowOnDelete = true };
+            var service = new FileDeletionService(adapter);
+            var entry = new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg");
+
+            var result = service.DeleteToRecycleBin(entry, FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(!result.Succeeded, "delete should fail");
+            AssertTrue(result.Message.IndexOf("boom", StringComparison.OrdinalIgnoreCase) >= 0, "failure message missing adapter error");
+        }
+
         private static void WithTempDirectory(Action<string> action)
         {
             var root = Path.Combine(Path.GetTempPath(), "wdc-tests-" + Guid.NewGuid().ToString("N"));
@@ -347,6 +413,26 @@ namespace WindowsDiskCleaner.Core.Tests
                 if (handler != null)
                 {
                     handler(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        private sealed class FakeDeleteAdapter : IFileDeleteAdapter
+        {
+            public int CallCount { get; private set; }
+
+            public string LastPath { get; private set; }
+
+            public bool ThrowOnDelete { get; set; }
+
+            public void MoveToRecycleBin(string path)
+            {
+                CallCount++;
+                LastPath = path;
+
+                if (ThrowOnDelete)
+                {
+                    throw new InvalidOperationException("boom");
                 }
             }
         }

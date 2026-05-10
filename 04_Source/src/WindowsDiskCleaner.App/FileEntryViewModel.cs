@@ -44,6 +44,16 @@ namespace WindowsDiskCleaner.App
             get { return _riskAssessment.Reason; }
         }
 
+        public bool IsHighRisk
+        {
+            get { return _riskAssessment.Level == FileRiskLevel.System || _riskAssessment.Level == FileRiskLevel.ProgramInstall; }
+        }
+
+        public FileEntry Entry
+        {
+            get { return _entry; }
+        }
+
         public DateTime CreatedAt
         {
             get { return _entry.CreatedAt; }
@@ -77,4 +87,3 @@ namespace WindowsDiskCleaner.App
         }
     }
 }
-

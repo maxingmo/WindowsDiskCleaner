@@ -19,12 +19,16 @@ $references = @(
     '/reference:System.Core.dll',
     '/reference:System.Xaml.dll',
     '/reference:System.Windows.Forms.dll',
+    '/reference:Microsoft.VisualBasic.dll',
     "/reference:$presentationCore",
     "/reference:$presentationFramework",
     "/reference:$windowsBase"
 )
 
 $sources = @(
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteConfirmation.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteResult.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeletionService.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileEntry.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileFilter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileFilterOptions.cs'),
@@ -32,6 +36,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskClassifier.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskLevel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileScanner.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\IFileDeleteAdapter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\QuickFileFilter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanError.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanOptions.cs'),
@@ -43,6 +48,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.App\MainWindowViewModel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\Program.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\QuickFilterOption.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.App\RecycleBinDeleteAdapter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\RelayCommand.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\StartupDiagnostics.cs')
 )

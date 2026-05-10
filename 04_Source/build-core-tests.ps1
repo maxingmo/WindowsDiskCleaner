@@ -3,12 +3,15 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $csc = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $outDir = Join-Path $root 'artifacts\tests'
-$outFile = Join-Path $outDir 'WindowsDiskCleaner.Core.Tests.exe'
+$outFile = Join-Path $outDir 'CoreTests.exe'
 
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
 $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\DebouncedAction.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteConfirmation.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteResult.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeletionService.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileEntry.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileFilter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileFilterOptions.cs'),
@@ -17,6 +20,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskLevel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileScanner.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\IDebounceTimer.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\IFileDeleteAdapter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\QuickFileFilter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanError.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanOptions.cs'),
