@@ -32,7 +32,10 @@ namespace WindowsDiskCleaner.Core.Tests
                 DeleteServiceDeletesConfirmedNormalFile,
                 DeleteServiceRequiresHighRiskConfirmation,
                 DeleteServiceDeletesHighRiskFileAfterSecondConfirmation,
-                DeleteServiceReturnsFailureWhenAdapterThrows
+                DeleteServiceReturnsFailureWhenAdapterThrows,
+                FolderTreeBuilderGroupsFilesByFolder,
+                FolderTreeBuilderRollsUpNestedFolderTotals,
+                FolderTreeBuilderSortsFoldersBeforeFiles
             };
 
             var failed = 0;
@@ -343,6 +346,59 @@ namespace WindowsDiskCleaner.Core.Tests
 
             AssertTrue(!result.Succeeded, "delete should fail");
             AssertTrue(result.Message.IndexOf("boom", StringComparison.OrdinalIgnoreCase) >= 0, "failure message missing adapter error");
+        }
+
+        private static void FolderTreeBuilderGroupsFilesByFolder()
+        {
+            var builder = new FolderTreeBuilder();
+            var files = new[]
+            {
+                new FileEntry("a.txt", @"D:\Root\a.txt", 10, DateTime.Now, DateTime.Now, ".txt"),
+                new FileEntry("b.log", @"D:\Root\b.log", 20, DateTime.Now, DateTime.Now, ".log")
+            };
+
+            var roots = builder.Build(files).ToList();
+
+            AssertEqual(1, roots.Count, "root count");
+            AssertEqual(FolderTreeNodeType.Folder, roots[0].NodeType, "root type");
+            AssertEqual(@"D:\Root", roots[0].FullPath, "root path");
+            AssertEqual(2, roots[0].FileCount, "root file count");
+            AssertEqual(30L, roots[0].SizeBytes, "root size");
+            AssertEqual(2, roots[0].Children.Count, "children count");
+        }
+
+        private static void FolderTreeBuilderRollsUpNestedFolderTotals()
+        {
+            var builder = new FolderTreeBuilder();
+            var files = new[]
+            {
+                new FileEntry("a.txt", @"D:\Root\a.txt", 10, DateTime.Now, DateTime.Now, ".txt"),
+                new FileEntry("c.mp4", @"D:\Root\Media\c.mp4", 100, DateTime.Now, DateTime.Now, ".mp4")
+            };
+
+            var root = builder.Build(files).Single();
+            var media = root.Children.Single(child => child.NodeType == FolderTreeNodeType.Folder);
+
+            AssertEqual(2, root.FileCount, "root file count");
+            AssertEqual(110L, root.SizeBytes, "root size");
+            AssertEqual(1, media.FileCount, "media file count");
+            AssertEqual(100L, media.SizeBytes, "media size");
+        }
+
+        private static void FolderTreeBuilderSortsFoldersBeforeFiles()
+        {
+            var builder = new FolderTreeBuilder();
+            var files = new[]
+            {
+                new FileEntry("z.txt", @"D:\Root\z.txt", 10, DateTime.Now, DateTime.Now, ".txt"),
+                new FileEntry("a.txt", @"D:\Root\Folder\a.txt", 20, DateTime.Now, DateTime.Now, ".txt")
+            };
+
+            var root = builder.Build(files).Single();
+
+            AssertEqual(FolderTreeNodeType.Folder, root.Children[0].NodeType, "first child type");
+            AssertEqual("Folder", root.Children[0].Name, "first child name");
+            AssertEqual(FolderTreeNodeType.File, root.Children[1].NodeType, "second child type");
         }
 
         private static void WithTempDirectory(Action<string> action)

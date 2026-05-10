@@ -41,19 +41,23 @@ Run app:
 - The release executable is intentionally named `FileScannerP2.exe`.
 - Executables containing `WindowsDiskCleaner` in the assembly/file name were rejected by Windows on the current development machine before `Main()` ran.
 - The app is compiled as a console-subsystem executable because the Windows-subsystem build was also rejected in this environment. It still opens a WPF UI.
+- The core test script compiles tests as a DLL and invokes the private test `Main` method through PowerShell reflection. This avoids the local security policy that intermittently deletes or blocks newly generated test executables.
 
 ## Core Components
 
 - `FileScanner`: recursive filesystem scanning with cancellation and IO error collection.
 - `FileFilter`: in-memory filtering for scanned results.
 - `FileRiskClassifier`: conservative file risk-level classification.
+- `FolderTreeBuilder`: builds a folder/file tree from the current filtered file list without rescanning.
+- `FileDeletionService`: validates delete confirmation level before moving files through the delete adapter.
 - `DebouncedAction`: test-covered debounce helper. The current WPF UI uses `Binding.Delay` for text input filtering.
 
 ## UI Components
 
 - `MainWindow`: code-built WPF shell.
-- `MainWindowViewModel`: scan, filter, cancel, and status orchestration.
+- `MainWindowViewModel`: scan, filter, cancel, view mode, delete, and status orchestration.
 - `FileEntryViewModel`: table row projection, including risk-level display.
+- `FolderTreeNodeViewModel`: tree row projection for folder view.
 - `QuickFilterOption`: UI model for common filter groups.
 
 ## Verification Rule
@@ -65,5 +69,4 @@ powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04
 powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app.ps1"
 ```
 
-Then launch `FileScannerP2.exe` and confirm the main window opens.
-
+Then launch `FileScannerP2.exe` and confirm the main window opens manually when automated launch is blocked by local Windows security policy.

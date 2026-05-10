@@ -2,8 +2,8 @@ $ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $csc = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-$outDir = Join-Path $root 'artifacts\tests'
-$outFile = Join-Path $outDir 'CoreTests.exe'
+$outDir = Join-Path $root 'artifacts\check'
+$outFile = Join-Path $outDir 'WindowsDiskCleanerCoreTests.dll'
 
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
@@ -19,6 +19,9 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskClassifier.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskLevel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileScanner.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FolderTreeBuilder.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FolderTreeNode.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FolderTreeNodeType.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\IDebounceTimer.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\IFileDeleteAdapter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\QuickFileFilter.cs'),
@@ -29,12 +32,15 @@ $sources = @(
     (Join-Path $root 'tests\WindowsDiskCleaner.Core.Tests\Program.cs')
 )
 
-& $csc /nologo /target:exe /out:$outFile $sources
+& $csc /nologo /target:library /out:$outFile $sources
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-& $outFile
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+$assembly = [System.Reflection.Assembly]::LoadFile($outFile)
+$programType = $assembly.GetType('WindowsDiskCleaner.Core.Tests.Program', $true)
+$main = $programType.GetMethod('Main', [System.Reflection.BindingFlags]'NonPublic, Static')
+$exitCode = [int]$main.Invoke($null, @())
+if ($exitCode -ne 0) {
+    exit $exitCode
 }

@@ -21,8 +21,9 @@ powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04
 1. Click `选择目录`.
 2. Pick a folder or disk path.
 3. Click `开始扫描`.
-4. Review the table.
+4. Review the results in `列表视图` or `文件夹视图`.
 5. Use filters to narrow results.
+6. Select a file and click `删除文件` if you want to move it to the Recycle Bin.
 
 ## Filters
 
@@ -36,6 +37,13 @@ Available filters:
 
 Text filters use a short delay to keep typing smooth.
 
+## Result Views
+
+- `列表视图`: the original sortable file table.
+- `文件夹视图`: groups the current filtered results by folder. Folder rows show descendant file count and total size; file rows show size, risk level, and modified time.
+
+Switching views does not rescan the disk. Filters affect both views.
+
 ## File Level Column
 
 The `文件级别` column is a safety hint, not a delete decision.
@@ -48,7 +56,13 @@ Levels:
 - `缓存/临时级`: cache, temp, log, backup, and temporary-looking files.
 - `未知/谨慎级`: unmatched files. Review carefully.
 
+## Delete Behavior
+
+- Deletes use the Windows Recycle Bin by default.
+- Normal files require one confirmation.
+- `系统级` and `程序安装级` files require a second high-risk confirmation.
+- Folder nodes in `文件夹视图` cannot be deleted in this phase. Select a file node before deleting.
+
 ## Current Limitation
 
-This prototype does not delete files yet. Deletion will be added in a later phase with recycle-bin behavior and second confirmation for high-risk files.
-
+Batch deletion and folder-level deletion are not implemented yet.

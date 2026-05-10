@@ -1,6 +1,6 @@
 # WindowsDiskCleaner
 
-WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, and deletion-risk hints before any delete feature is added.
+WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, folder-style result browsing, deletion-risk hints, and safe single-file recycle-bin deletion.
 
 The runnable prototype is currently published locally as:
 
@@ -15,7 +15,9 @@ The runnable prototype is currently published locally as:
 - Select a local folder to scan.
 - Recursively list files under the selected folder.
 - Show file name, file level, size, extension, created time, modified time, and full path.
-- Sort table columns.
+- Sort table columns in list view.
+- Switch between flat list view and folder tree view.
+- In folder view, show folders with rolled-up file count and total size, with files listed below their containing folders.
 - Cancel an active scan.
 - Skip inaccessible files/folders without crashing.
 - Filter scanned results by:
@@ -31,6 +33,8 @@ The runnable prototype is currently published locally as:
   - User Data Level
   - Cache/Temporary Level
   - Unknown/Caution Level
+- Delete a selected file to the Windows Recycle Bin.
+- Require an extra confirmation for system-level and program-install-level files.
 
 ## Project Status
 
@@ -39,13 +43,14 @@ Completed:
 - P1: Basic Scan MVP
 - P2: Search and Filter Enhancement
 - P3 partial: File Risk Level Column
+- P4: Safe Single-File Delete
+- P5A: Folder Tree View Mode
 
 Not yet implemented:
 
-- file deletion
-- recycle-bin integration
 - batch selection
-- second confirmation for high-risk files
+- batch delete
+- folder-level delete
 - duplicate file detection
 - charts and visual storage analysis
 - installer packaging
@@ -94,16 +99,16 @@ Run app:
 
 ## Latest Verified State
 
-- 16 core tests passed.
-- App startup verified with title: `File Scanner P3 - Risk Levels`.
+- 24 core tests passed.
+- App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
+- Current title: `File Scanner P5A - Folder View`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps
 
 Recommended next work:
 
-1. Add selected-file risk detail display.
-2. Add color/icon hints for risk levels.
-3. Add risk-level filter.
-4. Start P4: single-file delete with recycle-bin default and high-risk confirmation.
-
+1. Add batch selection and batch recycle-bin deletion.
+2. Add selected-file risk detail display.
+3. Add color/icon hints for risk levels.
+4. Add risk-level filter.

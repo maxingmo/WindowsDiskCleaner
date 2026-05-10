@@ -17,10 +17,13 @@ namespace WindowsDiskCleaner.App
     {
         private readonly FileScanner _scanner;
         private readonly FileFilter _filter;
+        private readonly FolderTreeBuilder _folderTreeBuilder;
         private readonly FileDeletionService _deletionService;
         private readonly List<FileEntry> _allFiles;
         private CancellationTokenSource _cancellation;
         private FileEntryViewModel _selectedFile;
+        private FolderTreeNodeViewModel _selectedFolderTreeNode;
+        private ResultViewMode _viewMode;
         private string _rootPath;
         private string _statusText;
         private string _keywordFilter;
@@ -34,11 +37,14 @@ namespace WindowsDiskCleaner.App
         {
             _scanner = new FileScanner();
             _filter = new FileFilter();
+            _folderTreeBuilder = new FolderTreeBuilder();
             _deletionService = new FileDeletionService(new RecycleBinDeleteAdapter());
             _allFiles = new List<FileEntry>();
             Files = new ObservableCollection<FileEntryViewModel>();
+            FolderTree = new ObservableCollection<FolderTreeNodeViewModel>();
             QuickFilters = new ObservableCollection<QuickFilterOption>(QuickFilterOption.CreateDefaults());
             _selectedQuickFilter = QuickFilters[0];
+            _viewMode = ResultViewMode.List;
             BrowseCommand = new RelayCommand(Browse, () => !IsScanning);
             ScanCommand = new RelayCommand(StartScan, CanStartScan);
             CancelCommand = new RelayCommand(CancelScan, () => IsScanning);
@@ -50,6 +56,8 @@ namespace WindowsDiskCleaner.App
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<FileEntryViewModel> Files { get; private set; }
+
+        public ObservableCollection<FolderTreeNodeViewModel> FolderTree { get; private set; }
 
         public ObservableCollection<QuickFilterOption> QuickFilters { get; private set; }
 
@@ -73,6 +81,44 @@ namespace WindowsDiskCleaner.App
                     _selectedFile = value;
                     OnPropertyChanged("SelectedFile");
                     RefreshCommands();
+                }
+            }
+        }
+
+        public FolderTreeNodeViewModel SelectedFolderTreeNode
+        {
+            get { return _selectedFolderTreeNode; }
+            set
+            {
+                if (_selectedFolderTreeNode != value)
+                {
+                    _selectedFolderTreeNode = value;
+                    OnPropertyChanged("SelectedFolderTreeNode");
+                    SelectedFile = value == null ? null : value.FileEntry;
+                }
+            }
+        }
+
+        public bool IsListView
+        {
+            get { return _viewMode == ResultViewMode.List; }
+            set
+            {
+                if (value)
+                {
+                    SetViewMode(ResultViewMode.List);
+                }
+            }
+        }
+
+        public bool IsFolderView
+        {
+            get { return _viewMode == ResultViewMode.Folder; }
+            set
+            {
+                if (value)
+                {
+                    SetViewMode(ResultViewMode.Folder);
                 }
             }
         }
@@ -221,7 +267,9 @@ namespace WindowsDiskCleaner.App
 
             _allFiles.Clear();
             Files.Clear();
+            FolderTree.Clear();
             SelectedFile = null;
+            SelectedFolderTreeNode = null;
             IsScanning = true;
             _cancellation = new CancellationTokenSource();
             StatusText = "\u6b63\u5728\u626b\u63cf...";
@@ -384,11 +432,37 @@ namespace WindowsDiskCleaner.App
 
         private void RebuildVisibleFiles(IEnumerable<FileEntry> files)
         {
+            var selectedPath = SelectedFile == null ? null : SelectedFile.FullPath;
+            var visibleFiles = files.ToList();
+            var filesByPath = new Dictionary<string, FileEntryViewModel>(StringComparer.OrdinalIgnoreCase);
+
             Files.Clear();
-            foreach (var file in files)
+            foreach (var file in visibleFiles)
             {
-                Files.Add(new FileEntryViewModel(file));
+                var fileViewModel = new FileEntryViewModel(file);
+                Files.Add(fileViewModel);
+                filesByPath[file.FullPath] = fileViewModel;
             }
+
+            FolderTree.Clear();
+            foreach (var node in _folderTreeBuilder.Build(visibleFiles))
+            {
+                FolderTree.Add(FolderTreeNodeViewModel.Create(node, filesByPath));
+            }
+
+            ClearSelectedFolderTreeNodeOnly();
+
+            if (!string.IsNullOrWhiteSpace(selectedPath))
+            {
+                FileEntryViewModel selected;
+                if (filesByPath.TryGetValue(selectedPath, out selected))
+                {
+                    SelectedFile = selected;
+                    return;
+                }
+            }
+
+            SelectedFile = null;
         }
 
         private static string BuildStatus(string prefix, int visibleCount, int totalCount, long visibleBytes, int skippedCount)
@@ -430,6 +504,33 @@ namespace WindowsDiskCleaner.App
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        private void SetViewMode(ResultViewMode viewMode)
+        {
+            if (_viewMode != viewMode)
+            {
+                _viewMode = viewMode;
+                SelectedFile = null;
+                SelectedFolderTreeNode = null;
+                OnPropertyChanged("IsListView");
+                OnPropertyChanged("IsFolderView");
+            }
+        }
+
+        private void ClearSelectedFolderTreeNodeOnly()
+        {
+            if (_selectedFolderTreeNode != null)
+            {
+                _selectedFolderTreeNode = null;
+                OnPropertyChanged("SelectedFolderTreeNode");
+            }
+        }
+
+        private enum ResultViewMode
+        {
+            List,
+            Folder
         }
     }
 }

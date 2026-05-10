@@ -10,7 +10,7 @@ namespace WindowsDiskCleaner.App
     {
         public MainWindow()
         {
-            Title = "File Scanner P4 - Safe Delete";
+            Title = "File Scanner P5A - Folder View";
             Width = 1240;
             Height = 720;
             MinWidth = 980;
@@ -26,6 +26,7 @@ namespace WindowsDiskCleaner.App
                 Margin = new Thickness(16)
             };
 
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -75,6 +76,14 @@ namespace WindowsDiskCleaner.App
             Grid.SetRow(filters, 2);
             root.Children.Add(filters);
 
+            var viewModeBar = BuildViewModeBar();
+            Grid.SetRow(viewModeBar, 3);
+            root.Children.Add(viewModeBar);
+
+            var resultsHost = new Grid();
+            Grid.SetRow(resultsHost, 4);
+            root.Children.Add(resultsHost);
+
             var grid = new DataGrid
             {
                 AutoGenerateColumns = false,
@@ -85,6 +94,10 @@ namespace WindowsDiskCleaner.App
                 EnableColumnVirtualization = true,
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal
             };
+            grid.SetBinding(UIElement.VisibilityProperty, new Binding("IsListView")
+            {
+                Converter = new BooleanToVisibilityConverter()
+            });
             grid.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("Files"));
             grid.SetBinding(DataGrid.SelectedItemProperty, new Binding("SelectedFile")
             {
@@ -98,8 +111,10 @@ namespace WindowsDiskCleaner.App
             grid.Columns.Add(new DataGridTextColumn { Header = "\u521b\u5efa\u65f6\u95f4", Binding = new Binding("CreatedAt"), Width = 150 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u4fee\u6539\u65f6\u95f4", Binding = new Binding("ModifiedAt"), Width = 150 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u5b8c\u6574\u8def\u5f84", Binding = new Binding("FullPath"), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
-            Grid.SetRow(grid, 3);
-            root.Children.Add(grid);
+            resultsHost.Children.Add(grid);
+
+            var tree = BuildFolderTree();
+            resultsHost.Children.Add(tree);
 
             var statusBorder = new Border
             {
@@ -114,10 +129,103 @@ namespace WindowsDiskCleaner.App
             };
             status.SetBinding(TextBlock.TextProperty, new Binding("StatusText"));
             statusBorder.Child = status;
-            Grid.SetRow(statusBorder, 4);
+            Grid.SetRow(statusBorder, 5);
             root.Children.Add(statusBorder);
 
             return root;
+        }
+
+        private static UIElement BuildViewModeBar()
+        {
+            var panel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+
+            panel.Children.Add(new TextBlock
+            {
+                Text = "\u663e\u793a\u65b9\u5f0f",
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = new SolidColorBrush(Color.FromRgb(88, 96, 105)),
+                Margin = new Thickness(0, 0, 12, 0)
+            });
+
+            panel.Children.Add(CreateViewModeRadioButton("\u5217\u8868\u89c6\u56fe", "IsListView"));
+            panel.Children.Add(CreateViewModeRadioButton("\u6587\u4ef6\u5939\u89c6\u56fe", "IsFolderView"));
+
+            return panel;
+        }
+
+        private static RadioButton CreateViewModeRadioButton(string text, string bindingPath)
+        {
+            var radioButton = new RadioButton
+            {
+                Content = text,
+                GroupName = "ResultViewMode",
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 16, 0)
+            };
+
+            radioButton.SetBinding(ToggleButton.IsCheckedProperty, new Binding(bindingPath)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+
+            return radioButton;
+        }
+
+        private static TreeView BuildFolderTree()
+        {
+            var tree = new TreeView
+            {
+                BorderBrush = new SolidColorBrush(Color.FromRgb(215, 220, 226)),
+                BorderThickness = new Thickness(1)
+            };
+
+            tree.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
+            tree.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
+            tree.SetBinding(UIElement.VisibilityProperty, new Binding("IsFolderView")
+            {
+                Converter = new BooleanToVisibilityConverter()
+            });
+            tree.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("FolderTree"));
+            tree.SelectedItemChanged += OnFolderTreeSelectedItemChanged;
+            tree.ItemTemplate = BuildFolderTreeTemplate();
+
+            return tree;
+        }
+
+        private static HierarchicalDataTemplate BuildFolderTreeTemplate()
+        {
+            var template = new HierarchicalDataTemplate(typeof(FolderTreeNodeViewModel));
+            template.ItemsSource = new Binding("Children");
+
+            var text = new FrameworkElementFactory(typeof(TextBlock));
+            text.SetBinding(TextBlock.TextProperty, new Binding("DisplayText"));
+            text.SetBinding(FrameworkElement.ToolTipProperty, new Binding("FullPath"));
+            text.SetValue(TextBlock.MarginProperty, new Thickness(2, 3, 2, 3));
+
+            template.VisualTree = text;
+            return template;
+        }
+
+        private static void OnFolderTreeSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> args)
+        {
+            var tree = sender as TreeView;
+            if (tree == null)
+            {
+                return;
+            }
+
+            var viewModel = tree.DataContext as MainWindowViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
+
+            viewModel.SelectedFolderTreeNode = args.NewValue as FolderTreeNodeViewModel;
         }
 
         private static UIElement BuildFilterBar()
