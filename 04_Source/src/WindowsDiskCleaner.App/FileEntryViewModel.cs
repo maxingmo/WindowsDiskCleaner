@@ -1,17 +1,34 @@
 using System;
+using System.ComponentModel;
 using WindowsDiskCleaner.Core;
 
 namespace WindowsDiskCleaner.App
 {
-    public sealed class FileEntryViewModel
+    public sealed class FileEntryViewModel : INotifyPropertyChanged
     {
         private readonly FileEntry _entry;
         private readonly FileRiskAssessment _riskAssessment;
+        private bool _isSelected;
 
         public FileEntryViewModel(FileEntry entry)
         {
             _entry = entry;
             _riskAssessment = new FileRiskClassifier().Classify(entry);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged("IsSelected");
+                }
+            }
         }
 
         public string Name
@@ -84,6 +101,15 @@ namespace WindowsDiskCleaner.App
             return unit == 0
                 ? bytes + " " + units[unit]
                 : size.ToString("0.##") + " " + units[unit];
+        }
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            var handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

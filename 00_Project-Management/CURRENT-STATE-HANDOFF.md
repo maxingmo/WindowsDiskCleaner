@@ -76,6 +76,20 @@ Delivered:
 - selecting a file node reuses the existing selected-file delete flow
 - folder nodes are display-only in this phase
 
+### P6: Batch Selection and Batch Delete
+
+Delivered:
+
+- checkbox column in `列表视图`
+- `全选当前结果`
+- `清空选择`
+- checked-file count summary
+- `批量删除` button
+- batch delete summary confirmation
+- high-risk second confirmation when checked files include `系统级` or `程序安装级`
+- successful batch delete removes deleted files from in-memory scan results
+- partial failures leave failed files visible
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -88,6 +102,7 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe
 - The app must be compiled directly as `FileScannerP2.exe`.
 - Executables containing the name `WindowsDiskCleaner` were rejected by Windows before `Main()` with `Access is denied`.
 - Test executables were also unstable in this environment. `build-core-tests.ps1` now compiles tests as a DLL and invokes the test entry point through PowerShell reflection.
+- 360 security software can quarantine unsigned local builds. The project folder has been added to the trust list for this machine.
 - `build-app.ps1` currently emits:
 
 ```text
@@ -118,8 +133,8 @@ Run app:
 Latest verified status:
 
 ```text
-24 core tests passed.
-App build verified with title: File Scanner P5A - Folder View.
+29 core tests passed.
+App build verified with title: File Scanner P6 - Batch Delete.
 ```
 
 ## Key Source Files
@@ -136,6 +151,8 @@ Core:
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNode.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNodeType.cs
 04_Source\src\WindowsDiskCleaner.Core\FileDeletionService.cs
+04_Source\src\WindowsDiskCleaner.Core\FileBatchDeletionService.cs
+04_Source\src\WindowsDiskCleaner.Core\FileBatchDeleteResult.cs
 ```
 
 App:
@@ -157,9 +174,9 @@ Build:
 
 ## Suggested Next Phase
 
-Continue with P5/P6 cleanup workflow:
+Continue with P7 safety/detail polish:
 
-1. Add batch selection in list view.
-2. Add batch recycle-bin delete with high-risk summary confirmation.
-3. Add risk-level filter and visual color/icon hints.
-4. Consider folder-level selection/delete only after batch file deletion is stable.
+1. Manual UI acceptance for P6 batch delete.
+2. Add selected-file risk detail display.
+3. Add color/icon hints for risk levels.
+4. Add risk-level filter.

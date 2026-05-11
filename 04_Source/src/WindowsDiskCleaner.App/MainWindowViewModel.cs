@@ -19,6 +19,7 @@ namespace WindowsDiskCleaner.App
         private readonly FileFilter _filter;
         private readonly FolderTreeBuilder _folderTreeBuilder;
         private readonly FileDeletionService _deletionService;
+        private readonly FileBatchDeletionService _batchDeletionService;
         private readonly List<FileEntry> _allFiles;
         private CancellationTokenSource _cancellation;
         private FileEntryViewModel _selectedFile;
@@ -39,6 +40,7 @@ namespace WindowsDiskCleaner.App
             _filter = new FileFilter();
             _folderTreeBuilder = new FolderTreeBuilder();
             _deletionService = new FileDeletionService(new RecycleBinDeleteAdapter());
+            _batchDeletionService = new FileBatchDeletionService(new RecycleBinDeleteAdapter());
             _allFiles = new List<FileEntry>();
             Files = new ObservableCollection<FileEntryViewModel>();
             FolderTree = new ObservableCollection<FolderTreeNodeViewModel>();
@@ -50,6 +52,9 @@ namespace WindowsDiskCleaner.App
             CancelCommand = new RelayCommand(CancelScan, () => IsScanning);
             ClearFiltersCommand = new RelayCommand(ClearFilters, () => !IsScanning);
             DeleteSelectedCommand = new RelayCommand(DeleteSelectedFile, CanDeleteSelectedFile);
+            SelectAllVisibleCommand = new RelayCommand(SelectAllVisibleFiles, CanSelectVisibleFiles);
+            ClearSelectionCommand = new RelayCommand(ClearSelectedFiles, CanClearSelectedFiles);
+            DeleteCheckedCommand = new RelayCommand(DeleteCheckedFiles, CanDeleteCheckedFiles);
             StatusText = "\u8bf7\u9009\u62e9\u4e00\u4e2a\u76ee\u5f55\u5f00\u59cb\u626b\u63cf\u3002";
         }
 
@@ -70,6 +75,22 @@ namespace WindowsDiskCleaner.App
         public ICommand ClearFiltersCommand { get; private set; }
 
         public ICommand DeleteSelectedCommand { get; private set; }
+
+        public ICommand SelectAllVisibleCommand { get; private set; }
+
+        public ICommand ClearSelectionCommand { get; private set; }
+
+        public ICommand DeleteCheckedCommand { get; private set; }
+
+        public int CheckedFileCount
+        {
+            get { return Files.Count(file => file.IsSelected); }
+        }
+
+        public string CheckedFileSummary
+        {
+            get { return "\u5df2\u9009 " + CheckedFileCount + " \u4e2a\u6587\u4ef6"; }
+        }
 
         public FileEntryViewModel SelectedFile
         {
@@ -270,6 +291,7 @@ namespace WindowsDiskCleaner.App
             FolderTree.Clear();
             SelectedFile = null;
             SelectedFolderTreeNode = null;
+            NotifyCheckedSelectionChanged();
             IsScanning = true;
             _cancellation = new CancellationTokenSource();
             StatusText = "\u6b63\u5728\u626b\u63cf...";
@@ -374,6 +396,41 @@ namespace WindowsDiskCleaner.App
             return !IsScanning && SelectedFile != null;
         }
 
+        private bool CanSelectVisibleFiles()
+        {
+            return !IsScanning && Files.Count > 0;
+        }
+
+        private bool CanClearSelectedFiles()
+        {
+            return !IsScanning && CheckedFileCount > 0;
+        }
+
+        private bool CanDeleteCheckedFiles()
+        {
+            return !IsScanning && CheckedFileCount > 0;
+        }
+
+        private void SelectAllVisibleFiles()
+        {
+            foreach (var file in Files)
+            {
+                file.IsSelected = true;
+            }
+
+            NotifyCheckedSelectionChanged();
+        }
+
+        private void ClearSelectedFiles()
+        {
+            foreach (var file in Files)
+            {
+                file.IsSelected = false;
+            }
+
+            NotifyCheckedSelectionChanged();
+        }
+
         private void DeleteSelectedFile()
         {
             if (!CanDeleteSelectedFile())
@@ -430,16 +487,89 @@ namespace WindowsDiskCleaner.App
             StatusText = "\u5df2\u79fb\u5165\u56de\u6536\u7ad9\uff1a" + result.DeletedPath;
         }
 
+        private void DeleteCheckedFiles()
+        {
+            if (!CanDeleteCheckedFiles())
+            {
+                return;
+            }
+
+            var selectedFiles = Files.Where(file => file.IsSelected).ToList();
+            var selectedCount = selectedFiles.Count;
+            var highRiskCount = selectedFiles.Count(file => file.IsHighRisk);
+            var totalBytes = selectedFiles.Sum(file => file.SizeBytes);
+
+            var firstConfirm = System.Windows.MessageBox.Show(
+                "\u786e\u8ba4\u8981\u5c06\u5df2\u9009\u6587\u4ef6\u79fb\u5165\u56de\u6536\u7ad9\u5417\uff1f\n\n"
+                    + "\u6587\u4ef6\u6570\uff1a" + selectedCount + "\n"
+                    + "\u5408\u8ba1\u5927\u5c0f\uff1a" + FormatSize(totalBytes) + "\n"
+                    + "\u9ad8\u98ce\u9669\u6587\u4ef6\uff1a" + highRiskCount + "\n\n"
+                    + "\u8be5\u64cd\u4f5c\u4e0d\u4f1a\u76f4\u63a5\u6c38\u4e45\u5220\u9664\uff0c\u800c\u662f\u79fb\u5165 Windows \u56de\u6536\u7ad9\u3002",
+                "\u786e\u8ba4\u6279\u91cf\u5220\u9664",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (firstConfirm != MessageBoxResult.Yes)
+            {
+                StatusText = "\u5df2\u53d6\u6d88\u6279\u91cf\u5220\u9664\u3002";
+                return;
+            }
+
+            var confirmation = FileDeleteConfirmation.Confirmed;
+            if (highRiskCount > 0)
+            {
+                var secondConfirm = System.Windows.MessageBox.Show(
+                    "\u5df2\u9009\u6587\u4ef6\u4e2d\u5305\u542b " + highRiskCount + " \u4e2a\u7cfb\u7edf\u7ea7\u6216\u7a0b\u5e8f\u5b89\u88c5\u7ea7\u6587\u4ef6\u3002\n\n"
+                        + "\u5220\u9664\u8fd9\u4e9b\u6587\u4ef6\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf\u6216\u7a0b\u5e8f\u5f02\u5e38\u3002\n\n"
+                        + "\u5982\u679c\u4f60\u4ecd\u7136\u8981\u7ee7\u7eed\uff0c\u8bf7\u518d\u6b21\u786e\u8ba4\u3002",
+                    "\u9ad8\u98ce\u9669\u6587\u4ef6\u4e8c\u6b21\u786e\u8ba4",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Stop);
+
+                if (secondConfirm != MessageBoxResult.Yes)
+                {
+                    StatusText = "\u5df2\u53d6\u6d88\u9ad8\u98ce\u9669\u6279\u91cf\u5220\u9664\u3002";
+                    return;
+                }
+
+                confirmation = FileDeleteConfirmation.HighRiskConfirmed;
+            }
+
+            var result = _batchDeletionService.DeleteToRecycleBin(selectedFiles.Select(file => file.Entry), confirmation);
+            var deletedPaths = new HashSet<string>(result.DeletedPaths, StringComparer.OrdinalIgnoreCase);
+            foreach (var deletedPath in deletedPaths)
+            {
+                _allFiles.RemoveAll(file => string.Equals(file.FullPath, deletedPath, StringComparison.OrdinalIgnoreCase));
+            }
+
+            SelectedFile = null;
+            ApplyFilters();
+
+            if (result.Succeeded)
+            {
+                StatusText = "\u5df2\u79fb\u5165\u56de\u6536\u7ad9\uff1a" + result.DeletedCount + " / " + result.SelectedCount + " \u4e2a\u6587\u4ef6\u3002";
+            }
+            else
+            {
+                StatusText = "\u6279\u91cf\u5220\u9664\u90e8\u5206\u5931\u8d25\uff1a\u6210\u529f " + result.DeletedCount
+                    + " \u4e2a\uff0c\u5931\u8d25 " + result.FailedCount + " \u4e2a\u3002";
+            }
+        }
+
         private void RebuildVisibleFiles(IEnumerable<FileEntry> files)
         {
             var selectedPath = SelectedFile == null ? null : SelectedFile.FullPath;
+            var checkedPaths = Files.Where(file => file.IsSelected).Select(file => file.FullPath).ToList();
             var visibleFiles = files.ToList();
             var filesByPath = new Dictionary<string, FileEntryViewModel>(StringComparer.OrdinalIgnoreCase);
+            var checkedPathSet = new HashSet<string>(checkedPaths, StringComparer.OrdinalIgnoreCase);
 
             Files.Clear();
             foreach (var file in visibleFiles)
             {
                 var fileViewModel = new FileEntryViewModel(file);
+                fileViewModel.PropertyChanged += OnFileSelectionChanged;
+                fileViewModel.IsSelected = checkedPathSet.Contains(file.FullPath);
                 Files.Add(fileViewModel);
                 filesByPath[file.FullPath] = fileViewModel;
             }
@@ -463,6 +593,7 @@ namespace WindowsDiskCleaner.App
             }
 
             SelectedFile = null;
+            NotifyCheckedSelectionChanged();
         }
 
         private static string BuildStatus(string prefix, int visibleCount, int totalCount, long visibleBytes, int skippedCount)
@@ -495,6 +626,9 @@ namespace WindowsDiskCleaner.App
             ((RelayCommand)CancelCommand).RaiseCanExecuteChanged();
             ((RelayCommand)ClearFiltersCommand).RaiseCanExecuteChanged();
             ((RelayCommand)DeleteSelectedCommand).RaiseCanExecuteChanged();
+            ((RelayCommand)SelectAllVisibleCommand).RaiseCanExecuteChanged();
+            ((RelayCommand)ClearSelectionCommand).RaiseCanExecuteChanged();
+            ((RelayCommand)DeleteCheckedCommand).RaiseCanExecuteChanged();
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -525,6 +659,21 @@ namespace WindowsDiskCleaner.App
                 _selectedFolderTreeNode = null;
                 OnPropertyChanged("SelectedFolderTreeNode");
             }
+        }
+
+        private void OnFileSelectionChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == "IsSelected")
+            {
+                NotifyCheckedSelectionChanged();
+            }
+        }
+
+        private void NotifyCheckedSelectionChanged()
+        {
+            OnPropertyChanged("CheckedFileCount");
+            OnPropertyChanged("CheckedFileSummary");
+            RefreshCommands();
         }
 
         private enum ResultViewMode

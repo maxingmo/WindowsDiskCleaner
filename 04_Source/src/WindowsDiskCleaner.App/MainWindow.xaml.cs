@@ -10,7 +10,7 @@ namespace WindowsDiskCleaner.App
     {
         public MainWindow()
         {
-            Title = "File Scanner P5A - Folder View";
+            Title = "File Scanner P6 - Batch Delete";
             Width = 1240;
             Height = 720;
             MinWidth = 980;
@@ -81,8 +81,14 @@ namespace WindowsDiskCleaner.App
             root.Children.Add(viewModeBar);
 
             var resultsHost = new Grid();
+            resultsHost.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            resultsHost.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             Grid.SetRow(resultsHost, 4);
             root.Children.Add(resultsHost);
+
+            var batchBar = BuildBatchBar();
+            Grid.SetRow(batchBar, 0);
+            resultsHost.Children.Add(batchBar);
 
             var grid = new DataGrid
             {
@@ -94,6 +100,7 @@ namespace WindowsDiskCleaner.App
                 EnableColumnVirtualization = true,
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal
             };
+            Grid.SetRow(grid, 1);
             grid.SetBinding(UIElement.VisibilityProperty, new Binding("IsListView")
             {
                 Converter = new BooleanToVisibilityConverter()
@@ -103,6 +110,16 @@ namespace WindowsDiskCleaner.App
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            grid.Columns.Add(new DataGridCheckBoxColumn
+            {
+                Header = "\u9009\u62e9",
+                Binding = new Binding("IsSelected")
+                {
+                    Mode = BindingMode.TwoWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                },
+                Width = 58
             });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u540d", Binding = new Binding("Name"), Width = 190 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u7ea7\u522b", Binding = new Binding("RiskLevelDisplay"), Width = 120 });
@@ -114,6 +131,7 @@ namespace WindowsDiskCleaner.App
             resultsHost.Children.Add(grid);
 
             var tree = BuildFolderTree();
+            Grid.SetRow(tree, 1);
             resultsHost.Children.Add(tree);
 
             var statusBorder = new Border
@@ -133,6 +151,48 @@ namespace WindowsDiskCleaner.App
             root.Children.Add(statusBorder);
 
             return root;
+        }
+
+        private static UIElement BuildBatchBar()
+        {
+            var panel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+
+            panel.SetBinding(UIElement.VisibilityProperty, new Binding("IsListView")
+            {
+                Converter = new BooleanToVisibilityConverter()
+            });
+
+            panel.Children.Add(CreateBatchButton("\u5168\u9009\u5f53\u524d\u7ed3\u679c", "SelectAllVisibleCommand"));
+            panel.Children.Add(CreateBatchButton("\u6e05\u7a7a\u9009\u62e9", "ClearSelectionCommand"));
+            panel.Children.Add(CreateBatchButton("\u6279\u91cf\u5220\u9664", "DeleteCheckedCommand"));
+
+            var summary = new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = new SolidColorBrush(Color.FromRgb(88, 96, 105)),
+                Margin = new Thickness(8, 0, 0, 0)
+            };
+            summary.SetBinding(TextBlock.TextProperty, new Binding("CheckedFileSummary"));
+            panel.Children.Add(summary);
+
+            return panel;
+        }
+
+        private static Button CreateBatchButton(string text, string commandPath)
+        {
+            var button = new Button
+            {
+                Content = text,
+                MinWidth = 96,
+                Margin = new Thickness(0, 0, 8, 0),
+                Padding = new Thickness(8, 3, 8, 3)
+            };
+            button.SetBinding(Button.CommandProperty, new Binding(commandPath));
+            return button;
         }
 
         private static UIElement BuildViewModeBar()

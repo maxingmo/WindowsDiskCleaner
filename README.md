@@ -1,6 +1,6 @@
 # WindowsDiskCleaner
 
-WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, folder-style result browsing, deletion-risk hints, and safe single-file recycle-bin deletion.
+WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, folder-style result browsing, deletion-risk hints, and safe recycle-bin deletion for single or checked files.
 
 The runnable prototype is currently published locally as:
 
@@ -18,6 +18,7 @@ The runnable prototype is currently published locally as:
 - Sort table columns in list view.
 - Switch between flat list view and folder tree view.
 - In folder view, show folders with rolled-up file count and total size, with files listed below their containing folders.
+- Select all visible list results, clear checked files, and batch delete checked files.
 - Cancel an active scan.
 - Skip inaccessible files/folders without crashing.
 - Filter scanned results by:
@@ -33,7 +34,7 @@ The runnable prototype is currently published locally as:
   - User Data Level
   - Cache/Temporary Level
   - Unknown/Caution Level
-- Delete a selected file to the Windows Recycle Bin.
+- Delete a selected file or checked files to the Windows Recycle Bin.
 - Require an extra confirmation for system-level and program-install-level files.
 
 ## Project Status
@@ -45,11 +46,10 @@ Completed:
 - P3 partial: File Risk Level Column
 - P4: Safe Single-File Delete
 - P5A: Folder Tree View Mode
+- P6: Batch Selection and Batch Delete
 
 Not yet implemented:
 
-- batch selection
-- batch delete
 - folder-level delete
 - duplicate file detection
 - charts and visual storage analysis
@@ -99,16 +99,16 @@ Run app:
 
 ## Latest Verified State
 
-- 24 core tests passed.
+- 29 core tests passed.
 - App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
-- Current title: `File Scanner P5A - Folder View`.
+- Current title: `File Scanner P6 - Batch Delete`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps
 
 Recommended next work:
 
-1. Add batch selection and batch recycle-bin deletion.
+1. Manual UI acceptance for P6 batch delete.
 2. Add selected-file risk detail display.
 3. Add color/icon hints for risk levels.
 4. Add risk-level filter.

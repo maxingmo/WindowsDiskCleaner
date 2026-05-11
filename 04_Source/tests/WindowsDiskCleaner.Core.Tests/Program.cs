@@ -33,6 +33,11 @@ namespace WindowsDiskCleaner.Core.Tests
                 DeleteServiceRequiresHighRiskConfirmation,
                 DeleteServiceDeletesHighRiskFileAfterSecondConfirmation,
                 DeleteServiceReturnsFailureWhenAdapterThrows,
+                BatchDeleteRejectsEmptySelection,
+                BatchDeleteRejectsUnconfirmedSelection,
+                BatchDeleteRequiresHighRiskConfirmationBeforeAnyDelete,
+                BatchDeleteDeletesMixedFilesAfterHighRiskConfirmation,
+                BatchDeleteReportsPartialFailures,
                 FolderTreeBuilderGroupsFilesByFolder,
                 FolderTreeBuilderRollsUpNestedFolderTotals,
                 FolderTreeBuilderSortsFoldersBeforeFiles
@@ -348,6 +353,90 @@ namespace WindowsDiskCleaner.Core.Tests
             AssertTrue(result.Message.IndexOf("boom", StringComparison.OrdinalIgnoreCase) >= 0, "failure message missing adapter error");
         }
 
+        private static void BatchDeleteRejectsEmptySelection()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileBatchDeletionService(adapter);
+
+            var result = service.DeleteToRecycleBin(new FileEntry[0], FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(!result.Succeeded, "batch delete should fail");
+            AssertEqual(0, adapter.CallCount, "adapter calls");
+            AssertEqual(0, result.DeletedCount, "deleted count");
+        }
+
+        private static void BatchDeleteRejectsUnconfirmedSelection()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileBatchDeletionService(adapter);
+            var files = new[]
+            {
+                new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg"),
+                new FileEntry("notes.txt", @"C:\Users\Alice\Documents\notes.txt", 10, DateTime.Now, DateTime.Now, ".txt")
+            };
+
+            var result = service.DeleteToRecycleBin(files, FileDeleteConfirmation.NotConfirmed);
+
+            AssertTrue(!result.Succeeded, "batch delete should fail");
+            AssertEqual(0, adapter.CallCount, "adapter calls");
+            AssertEqual(0, result.DeletedCount, "deleted count");
+        }
+
+        private static void BatchDeleteRequiresHighRiskConfirmationBeforeAnyDelete()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileBatchDeletionService(adapter);
+            var files = new[]
+            {
+                new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg"),
+                new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll")
+            };
+
+            var result = service.DeleteToRecycleBin(files, FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(!result.Succeeded, "batch delete should fail");
+            AssertEqual(0, adapter.CallCount, "adapter calls");
+            AssertEqual(0, result.DeletedCount, "deleted count");
+        }
+
+        private static void BatchDeleteDeletesMixedFilesAfterHighRiskConfirmation()
+        {
+            var adapter = new FakeDeleteAdapter();
+            var service = new FileBatchDeletionService(adapter);
+            var files = new[]
+            {
+                new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg"),
+                new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll")
+            };
+
+            var result = service.DeleteToRecycleBin(files, FileDeleteConfirmation.HighRiskConfirmed);
+
+            AssertTrue(result.Succeeded, "batch delete should succeed");
+            AssertEqual(2, adapter.CallCount, "adapter calls");
+            AssertEqual(2, result.DeletedCount, "deleted count");
+            AssertEqual(0, result.FailedCount, "failed count");
+        }
+
+        private static void BatchDeleteReportsPartialFailures()
+        {
+            var adapter = new FakeDeleteAdapter { PathToFail = @"C:\Users\Alice\Documents\bad.txt" };
+            var service = new FileBatchDeletionService(adapter);
+            var files = new[]
+            {
+                new FileEntry("good.txt", @"C:\Users\Alice\Documents\good.txt", 10, DateTime.Now, DateTime.Now, ".txt"),
+                new FileEntry("bad.txt", @"C:\Users\Alice\Documents\bad.txt", 10, DateTime.Now, DateTime.Now, ".txt")
+            };
+
+            var result = service.DeleteToRecycleBin(files, FileDeleteConfirmation.Confirmed);
+
+            AssertTrue(!result.Succeeded, "batch delete should report partial failure");
+            AssertEqual(2, adapter.CallCount, "adapter calls");
+            AssertEqual(1, result.DeletedCount, "deleted count");
+            AssertEqual(1, result.FailedCount, "failed count");
+            AssertEqual(1, result.DeletedPaths.Count, "deleted path count");
+            AssertEqual(@"C:\Users\Alice\Documents\good.txt", result.DeletedPaths[0], "deleted path");
+        }
+
         private static void FolderTreeBuilderGroupsFilesByFolder()
         {
             var builder = new FolderTreeBuilder();
@@ -481,12 +570,14 @@ namespace WindowsDiskCleaner.Core.Tests
 
             public bool ThrowOnDelete { get; set; }
 
+            public string PathToFail { get; set; }
+
             public void MoveToRecycleBin(string path)
             {
                 CallCount++;
                 LastPath = path;
 
-                if (ThrowOnDelete)
+                if (ThrowOnDelete || string.Equals(PathToFail, path, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidOperationException("boom");
                 }

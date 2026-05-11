@@ -42,6 +42,7 @@ Run app:
 - Executables containing `WindowsDiskCleaner` in the assembly/file name were rejected by Windows on the current development machine before `Main()` ran.
 - The app is compiled as a console-subsystem executable because the Windows-subsystem build was also rejected in this environment. It still opens a WPF UI.
 - The core test script compiles tests as a DLL and invokes the private test `Main` method through PowerShell reflection. This avoids the local security policy that intermittently deletes or blocks newly generated test executables.
+- 360 security software may quarantine unsigned local builds. Add `D:\AI Workspaces\WindowsDiskCleaner` to the trust list for manual testing.
 
 ## Core Components
 
@@ -49,14 +50,15 @@ Run app:
 - `FileFilter`: in-memory filtering for scanned results.
 - `FileRiskClassifier`: conservative file risk-level classification.
 - `FolderTreeBuilder`: builds a folder/file tree from the current filtered file list without rescanning.
-- `FileDeletionService`: validates delete confirmation level before moving files through the delete adapter.
+- `FileDeletionService`: validates single-file delete confirmation level before moving files through the delete adapter.
+- `FileBatchDeletionService`: validates batch delete confirmation level before moving checked files through the delete adapter.
 - `DebouncedAction`: test-covered debounce helper. The current WPF UI uses `Binding.Delay` for text input filtering.
 
 ## UI Components
 
 - `MainWindow`: code-built WPF shell.
-- `MainWindowViewModel`: scan, filter, cancel, view mode, delete, and status orchestration.
-- `FileEntryViewModel`: table row projection, including risk-level display.
+- `MainWindowViewModel`: scan, filter, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
+- `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
 - `FolderTreeNodeViewModel`: tree row projection for folder view.
 - `QuickFilterOption`: UI model for common filter groups.
 

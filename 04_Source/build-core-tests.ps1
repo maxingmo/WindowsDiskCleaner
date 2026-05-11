@@ -9,6 +9,8 @@ New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
 $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\DebouncedAction.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeleteResult.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeletionService.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteConfirmation.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteResult.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeletionService.cs'),
