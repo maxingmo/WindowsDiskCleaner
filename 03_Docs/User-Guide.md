@@ -29,8 +29,15 @@ D:\AI Workspaces\WindowsDiskCleaner
 3. Click `开始扫描`.
 4. Review the results in `列表视图` or `文件夹视图`.
 5. Use filters to narrow results.
-6. Select a file to read its risk details in the bottom status area.
+6. Select a file to read its risk details in the bottom details area.
 7. Select a single file and click `删除文件`, or check multiple files and click `批量删除`.
+
+## Main Window Layout
+
+- Top area: scan path and primary actions.
+- Filter area: keyword, extension, size, date, quick filter, and risk-level filter.
+- Results area: view switching, batch actions, list view, and folder view.
+- Details area: selected-file risk/path information and current running status.
 
 ## Filters
 
@@ -47,7 +54,7 @@ Text filters use a short delay to keep typing smooth.
 
 ## Result Views
 
-- `列表视图`: the original sortable file table. This is where batch selection and batch delete are available.
+- `列表视图`: sortable file table. Batch selection and batch delete are available here.
 - `文件夹视图`: groups the current filtered results by folder. Folder rows show descendant file count and total size; file rows show size, risk level, and modified time.
 
 Switching views does not rescan the disk. Filters affect both views.
@@ -74,12 +81,6 @@ In `列表视图`:
 - Click `批量删除` to move checked files to the Windows Recycle Bin.
 
 Batch delete shows a summary with selected count, total size, and high-risk count. If any checked file is `系统级` or `程序安装级`, a second high-risk confirmation is required before anything is deleted.
-
-## File Level and Risk Details
-
-The `文件级别` column is a safety hint, not a delete decision.
-
-When a file is selected, the bottom status area shows the level, risk reason, and full path.
 
 ## Delete Behavior
 

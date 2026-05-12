@@ -57,7 +57,7 @@ Run app:
 
 ## UI Components
 
-- `MainWindow`: code-built WPF shell.
+- `MainWindow`: code-built WPF shell, organized into top operation, filter, results, and details sections.
 - `MainWindowViewModel`: scan, filter, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
 - `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
 - `FolderTreeNodeViewModel`: tree row projection for folder view.

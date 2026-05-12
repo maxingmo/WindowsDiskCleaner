@@ -110,6 +110,18 @@ Delivered:
 - WPF hex-color binding converter
 - no change to delete behavior
 
+### P9A: Main UI Layout Refresh
+
+Delivered:
+
+- main window reorganized into top operation, filter, results, and details sections
+- scan path and primary operations moved into a clearer top area
+- filters grouped into a dedicated filter section
+- view switching and batch actions grouped above the results
+- selected-file details and running status split into a bottom two-column area
+- list view row height, header height, border, and alternating row background refined
+- no change to scan, filter, or delete behavior
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -154,7 +166,7 @@ Latest verified status:
 
 ```text
 33 core tests passed.
-App build verified with title: File Scanner P8 - Risk Visual Hints.
+App build verified with title: File Scanner P9A - UI Layout.
 ```
 
 ## Key Source Files
@@ -198,8 +210,8 @@ Build:
 
 ## Suggested Next Phase
 
-Recommended P9 options:
+Recommended P9B options:
 
-1. Add duplicate-file detection.
-2. Add visual storage analysis.
-3. Add installer packaging.
+1. Refine folder-tree display text to remove `[DIR]` / `[FILE]`.
+2. Add more polished table styles and selected-row styling.
+3. Add duplicate-file detection.
