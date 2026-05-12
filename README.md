@@ -27,6 +27,7 @@ The runnable prototype is currently published locally as:
   - minimum size in MB
   - modified-before date
   - quick filter categories
+  - file risk level
 - Delayed text filtering to reduce input lag.
 - Classify files into risk levels:
   - System Level
@@ -34,6 +35,7 @@ The runnable prototype is currently published locally as:
   - User Data Level
   - Cache/Temporary Level
   - Unknown/Caution Level
+- Show selected-file risk details before deletion.
 - Delete a selected file or checked files to the Windows Recycle Bin.
 - Require an extra confirmation for system-level and program-install-level files.
 
@@ -47,6 +49,7 @@ Completed:
 - P4: Safe Single-File Delete
 - P5A: Folder Tree View Mode
 - P6: Batch Selection and Batch Delete
+- P7: Risk Filter and Risk Details
 
 Not yet implemented:
 
@@ -99,16 +102,16 @@ Run app:
 
 ## Latest Verified State
 
-- 29 core tests passed.
+- 31 core tests passed.
 - App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
-- Current title: `File Scanner P6 - Batch Delete`.
+- Current title: `File Scanner P7 - Risk Filter`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps
 
 Recommended next work:
 
-1. Manual UI acceptance for P6 batch delete.
-2. Add selected-file risk detail display.
-3. Add color/icon hints for risk levels.
-4. Add risk-level filter.
+1. Manual UI acceptance for P7 risk filter and selected-file detail display.
+2. Add color/icon hints for risk levels.
+3. Add duplicate-file detection.
+4. Add visual storage analysis.

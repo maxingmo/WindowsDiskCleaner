@@ -10,6 +10,12 @@ namespace WindowsDiskCleaner.Core
         private static readonly HashSet<string> ArchiveExtensions = CreateExtensions(".zip", ".rar", ".7z", ".tar", ".gz", ".iso");
         private static readonly HashSet<string> InstallerExtensions = CreateExtensions(".exe", ".msi", ".msix", ".appx");
         private static readonly HashSet<string> LogAndTemporaryExtensions = CreateExtensions(".log", ".tmp", ".temp", ".bak", ".old");
+        private readonly FileRiskClassifier _riskClassifier;
+
+        public FileFilter()
+        {
+            _riskClassifier = new FileRiskClassifier();
+        }
 
         public IEnumerable<FileEntry> Apply(IEnumerable<FileEntry> files, FileFilterOptions options)
         {
@@ -43,6 +49,11 @@ namespace WindowsDiskCleaner.Core
                 }
 
                 if (!MatchesQuickFilter(file, options.QuickFilter))
+                {
+                    continue;
+                }
+
+                if (options.RiskLevel.HasValue && _riskClassifier.Classify(file).Level != options.RiskLevel.Value)
                 {
                     continue;
                 }
@@ -114,4 +125,3 @@ namespace WindowsDiskCleaner.Core
         }
     }
 }
-

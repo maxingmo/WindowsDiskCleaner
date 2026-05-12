@@ -61,6 +61,7 @@ Run app:
 - `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
 - `FolderTreeNodeViewModel`: tree row projection for folder view.
 - `QuickFilterOption`: UI model for common filter groups.
+- `RiskFilterOption`: UI model for file risk-level filtering.
 
 ## Verification Rule
 

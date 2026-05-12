@@ -29,7 +29,8 @@ D:\AI Workspaces\WindowsDiskCleaner
 3. Click `开始扫描`.
 4. Review the results in `列表视图` or `文件夹视图`.
 5. Use filters to narrow results.
-6. Select a single file and click `删除文件`, or check multiple files and click `批量删除`.
+6. Select a file to read its risk details in the bottom status area.
+7. Select a single file and click `删除文件`, or check multiple files and click `批量删除`.
 
 ## Filters
 
@@ -40,6 +41,7 @@ Available filters:
 - `最小 MB`: shows files at or above the entered size.
 - `早于修改日`: shows older files.
 - `快捷筛选`: common file groups such as large files, videos, archives, installers, logs, and temporary files.
+- `文件级别`: shows only one risk level, or `全部级别`.
 
 Text filters use a short delay to keep typing smooth.
 
@@ -61,7 +63,7 @@ In `列表视图`:
 
 Batch delete shows a summary with selected count, total size, and high-risk count. If any checked file is `系统级` or `程序安装级`, a second high-risk confirmation is required before anything is deleted.
 
-## File Level Column
+## File Level and Risk Details
 
 The `文件级别` column is a safety hint, not a delete decision.
 
@@ -72,6 +74,8 @@ Levels:
 - `用户数据级`: documents, downloads, pictures, videos, desktop, and similar user files.
 - `缓存/临时级`: cache, temp, log, backup, and temporary-looking files.
 - `未知/谨慎级`: unmatched files. Review carefully.
+
+When a file is selected, the bottom status area shows the level, risk reason, and full path.
 
 ## Delete Behavior
 

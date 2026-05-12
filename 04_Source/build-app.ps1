@@ -56,6 +56,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.App\QuickFilterOption.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\RecycleBinDeleteAdapter.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\RelayCommand.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.App\RiskFilterOption.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\StartupDiagnostics.cs')
 )
 

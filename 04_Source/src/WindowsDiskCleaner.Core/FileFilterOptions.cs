@@ -18,6 +18,7 @@ namespace WindowsDiskCleaner.Core
         public DateTime? ModifiedBefore { get; set; }
 
         public QuickFileFilter QuickFilter { get; set; }
+
+        public FileRiskLevel? RiskLevel { get; set; }
     }
 }
-

@@ -19,14 +19,13 @@ namespace WindowsDiskCleaner.App
         {
             return new[]
             {
-                new QuickFilterOption("全部文件", QuickFileFilter.All),
-                new QuickFilterOption("大文件 >= 100MB", QuickFileFilter.LargeFiles),
-                new QuickFilterOption("视频文件", QuickFileFilter.Videos),
-                new QuickFilterOption("压缩包", QuickFileFilter.Archives),
-                new QuickFilterOption("安装包", QuickFileFilter.Installers),
-                new QuickFilterOption("日志/临时文件", QuickFileFilter.LogsAndTemporary)
+                new QuickFilterOption("\u5168\u90e8\u6587\u4ef6", QuickFileFilter.All),
+                new QuickFilterOption("\u5927\u6587\u4ef6 >= 100MB", QuickFileFilter.LargeFiles),
+                new QuickFilterOption("\u89c6\u9891\u6587\u4ef6", QuickFileFilter.Videos),
+                new QuickFilterOption("\u538b\u7f29\u5305", QuickFileFilter.Archives),
+                new QuickFilterOption("\u5b89\u88c5\u5305", QuickFileFilter.Installers),
+                new QuickFilterOption("\u65e5\u5fd7/\u4e34\u65f6\u6587\u4ef6", QuickFileFilter.LogsAndTemporary)
             };
         }
     }
 }
-

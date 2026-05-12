@@ -21,6 +21,8 @@ namespace WindowsDiskCleaner.Core.Tests
                 FilterAppliesMinimumSize,
                 FilterAppliesModifiedBefore,
                 FilterAppliesQuickTypeAndCombinedRules,
+                FilterAppliesRiskLevel,
+                FilterDoesNotApplyRiskLevelWhenUnset,
                 DebouncedActionDoesNotRunBeforeTimerElapsed,
                 DebouncedActionRunNowStopsTimerAndRunsImmediately,
                 RiskClassifierMarksWindowsPathAsSystem,
@@ -198,6 +200,27 @@ namespace WindowsDiskCleaner.Core.Tests
             AssertEqual("setup.exe", result[0].Name, "combined quick result");
         }
 
+        private static void FilterAppliesRiskLevel()
+        {
+            var files = RiskSampleFiles();
+            var filter = new FileFilter();
+
+            var result = filter.Apply(files, new FileFilterOptions { RiskLevel = FileRiskLevel.CacheTemporary }).ToList();
+
+            AssertEqual(1, result.Count, "risk level count");
+            AssertEqual("trace.log", result[0].Name, "risk level result");
+        }
+
+        private static void FilterDoesNotApplyRiskLevelWhenUnset()
+        {
+            var files = RiskSampleFiles();
+            var filter = new FileFilter();
+
+            var result = filter.Apply(files, new FileFilterOptions()).ToList();
+
+            AssertEqual(files.Length, result.Count, "risk level unset count");
+        }
+
         private static FileEntry[] SampleFiles()
         {
             return new[]
@@ -207,6 +230,18 @@ namespace WindowsDiskCleaner.Core.Tests
                 new FileEntry("setup.exe", @"D:\Downloads\setup.exe", 80L * 1024L * 1024L, new DateTime(2026, 1, 1), new DateTime(2026, 2, 1), ".exe"),
                 new FileEntry("trace.log", @"D:\Logs\trace.log", 2L * 1024L * 1024L, new DateTime(2026, 1, 1), new DateTime(2026, 2, 1), ".log"),
                 new FileEntry("notes.txt", @"D:\Docs\notes.txt", 10L * 1024L, new DateTime(2026, 1, 1), new DateTime(2026, 2, 1), ".txt")
+            };
+        }
+
+        private static FileEntry[] RiskSampleFiles()
+        {
+            return new[]
+            {
+                new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll"),
+                new FileEntry("app.dll", @"C:\Program Files\Vendor\App\app.dll", 10, DateTime.Now, DateTime.Now, ".dll"),
+                new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 10, DateTime.Now, DateTime.Now, ".jpg"),
+                new FileEntry("trace.log", @"C:\Users\Alice\AppData\Local\Vendor\Cache\trace.log", 10, DateTime.Now, DateTime.Now, ".log"),
+                new FileEntry("data.bin", @"D:\Unsorted\data.bin", 10, DateTime.Now, DateTime.Now, ".bin")
             };
         }
 

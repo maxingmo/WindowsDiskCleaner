@@ -19,25 +19,40 @@ namespace WindowsDiskCleaner.Core
 
             if (IsSystemPath(path))
             {
-                return new FileRiskAssessment(FileRiskLevel.System, "系统级", "位于 Windows 系统目录，删除风险很高。");
+                return new FileRiskAssessment(
+                    FileRiskLevel.System,
+                    "\u7cfb\u7edf\u7ea7",
+                    "\u4f4d\u4e8e Windows \u7cfb\u7edf\u76ee\u5f55\uff0c\u5220\u9664\u98ce\u9669\u5f88\u9ad8\u3002");
             }
 
             if (IsProgramInstallPath(path))
             {
-                return new FileRiskAssessment(FileRiskLevel.ProgramInstall, "程序安装级", "位于程序安装目录，删除可能导致软件异常。");
+                return new FileRiskAssessment(
+                    FileRiskLevel.ProgramInstall,
+                    "\u7a0b\u5e8f\u5b89\u88c5\u7ea7",
+                    "\u4f4d\u4e8e\u7a0b\u5e8f\u5b89\u88c5\u76ee\u5f55\uff0c\u5220\u9664\u53ef\u80fd\u5bfc\u81f4\u8f6f\u4ef6\u5f02\u5e38\u3002");
             }
 
             if (IsCacheTemporaryPath(path) || CacheTemporaryExtensions.Contains(extension))
             {
-                return new FileRiskAssessment(FileRiskLevel.CacheTemporary, "缓存/临时级", "看起来像缓存、日志或临时文件，仍需确认来源。");
+                return new FileRiskAssessment(
+                    FileRiskLevel.CacheTemporary,
+                    "\u7f13\u5b58/\u4e34\u65f6\u7ea7",
+                    "\u770b\u8d77\u6765\u50cf\u7f13\u5b58\u3001\u65e5\u5fd7\u6216\u4e34\u65f6\u6587\u4ef6\uff0c\u4ecd\u9700\u786e\u8ba4\u6765\u6e90\u3002");
             }
 
             if (IsUserDataPath(path))
             {
-                return new FileRiskAssessment(FileRiskLevel.UserData, "用户数据级", "位于用户常用资料目录，删除前应确认是否仍需要。");
+                return new FileRiskAssessment(
+                    FileRiskLevel.UserData,
+                    "\u7528\u6237\u6570\u636e\u7ea7",
+                    "\u4f4d\u4e8e\u7528\u6237\u5e38\u7528\u8d44\u6599\u76ee\u5f55\uff0c\u5220\u9664\u524d\u5e94\u786e\u8ba4\u662f\u5426\u4ecd\u9700\u8981\u3002");
             }
 
-            return new FileRiskAssessment(FileRiskLevel.UnknownCaution, "未知/谨慎级", "未匹配到明确类别，建议谨慎处理。");
+            return new FileRiskAssessment(
+                FileRiskLevel.UnknownCaution,
+                "\u672a\u77e5/\u8c28\u614e\u7ea7",
+                "\u672a\u5339\u914d\u5230\u660e\u786e\u7c7b\u522b\uff0c\u5efa\u8bae\u8c28\u614e\u5904\u7406\u3002");
         }
 
         private static bool IsSystemPath(string path)
@@ -112,4 +127,3 @@ namespace WindowsDiskCleaner.Core
         }
     }
 }
-

@@ -32,6 +32,7 @@ namespace WindowsDiskCleaner.App
         private string _minimumSizeMbFilter;
         private DateTime? _modifiedBeforeFilter;
         private QuickFilterOption _selectedQuickFilter;
+        private RiskFilterOption _selectedRiskFilter;
         private bool _isScanning;
 
         public MainWindowViewModel()
@@ -45,7 +46,9 @@ namespace WindowsDiskCleaner.App
             Files = new ObservableCollection<FileEntryViewModel>();
             FolderTree = new ObservableCollection<FolderTreeNodeViewModel>();
             QuickFilters = new ObservableCollection<QuickFilterOption>(QuickFilterOption.CreateDefaults());
+            RiskFilters = new ObservableCollection<RiskFilterOption>(RiskFilterOption.CreateDefaults());
             _selectedQuickFilter = QuickFilters[0];
+            _selectedRiskFilter = RiskFilters[0];
             _viewMode = ResultViewMode.List;
             BrowseCommand = new RelayCommand(Browse, () => !IsScanning);
             ScanCommand = new RelayCommand(StartScan, CanStartScan);
@@ -65,6 +68,8 @@ namespace WindowsDiskCleaner.App
         public ObservableCollection<FolderTreeNodeViewModel> FolderTree { get; private set; }
 
         public ObservableCollection<QuickFilterOption> QuickFilters { get; private set; }
+
+        public ObservableCollection<RiskFilterOption> RiskFilters { get; private set; }
 
         public ICommand BrowseCommand { get; private set; }
 
@@ -101,8 +106,39 @@ namespace WindowsDiskCleaner.App
                 {
                     _selectedFile = value;
                     OnPropertyChanged("SelectedFile");
+                    OnPropertyChanged("SelectedFileRiskDetail");
+                    OnPropertyChanged("SelectedFilePathDetail");
                     RefreshCommands();
                 }
+            }
+        }
+
+        public string SelectedFileRiskDetail
+        {
+            get
+            {
+                if (SelectedFile == null)
+                {
+                    return "\u672a\u9009\u62e9\u6587\u4ef6\u3002\u9009\u62e9\u4e00\u884c\u53ef\u67e5\u770b\u5220\u9664\u98ce\u9669\u8bf4\u660e\u3002";
+                }
+
+                var riskMarker = SelectedFile.IsHighRisk
+                    ? "\u9ad8\u98ce\u9669"
+                    : "\u8bf7\u786e\u8ba4";
+
+                return "\u6587\u4ef6\u7ea7\u522b\uff1a" + SelectedFile.RiskLevelDisplay
+                    + " | " + riskMarker
+                    + " | " + SelectedFile.RiskReason;
+            }
+        }
+
+        public string SelectedFilePathDetail
+        {
+            get
+            {
+                return SelectedFile == null
+                    ? string.Empty
+                    : "\u5b8c\u6574\u8def\u5f84\uff1a" + SelectedFile.FullPath;
             }
         }
 
@@ -241,6 +277,20 @@ namespace WindowsDiskCleaner.App
             }
         }
 
+        public RiskFilterOption SelectedRiskFilter
+        {
+            get { return _selectedRiskFilter; }
+            set
+            {
+                if (_selectedRiskFilter != value && value != null)
+                {
+                    _selectedRiskFilter = value;
+                    OnPropertyChanged("SelectedRiskFilter");
+                    ApplyFilters();
+                }
+            }
+        }
+
         public bool IsScanning
         {
             get { return _isScanning; }
@@ -369,7 +419,8 @@ namespace WindowsDiskCleaner.App
                 Keyword = KeywordFilter,
                 Extension = ExtensionFilter,
                 ModifiedBefore = ModifiedBeforeFilter,
-                QuickFilter = SelectedQuickFilter == null ? QuickFileFilter.All : SelectedQuickFilter.Value
+                QuickFilter = SelectedQuickFilter == null ? QuickFileFilter.All : SelectedQuickFilter.Value,
+                RiskLevel = SelectedRiskFilter == null ? null : SelectedRiskFilter.Value
             };
 
             double minimumMb;
@@ -388,6 +439,7 @@ namespace WindowsDiskCleaner.App
             MinimumSizeMbFilter = string.Empty;
             ModifiedBeforeFilter = null;
             SelectedQuickFilter = QuickFilters[0];
+            SelectedRiskFilter = RiskFilters[0];
             ApplyFilters();
         }
 

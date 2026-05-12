@@ -90,6 +90,16 @@ Delivered:
 - successful batch delete removes deleted files from in-memory scan results
 - partial failures leave failed files visible
 
+### P7: Risk Filter and Risk Details
+
+Delivered:
+
+- `文件级别` filter dropdown
+- risk-level filtering in Core and App
+- selected-file risk detail display in the bottom status area
+- selected-file full path display in the bottom status area
+- fixed quick-filter Chinese labels
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -133,8 +143,8 @@ Run app:
 Latest verified status:
 
 ```text
-29 core tests passed.
-App build verified with title: File Scanner P6 - Batch Delete.
+31 core tests passed.
+App build verified with title: File Scanner P7 - Risk Filter.
 ```
 
 ## Key Source Files
@@ -144,6 +154,7 @@ Core:
 ```text
 04_Source\src\WindowsDiskCleaner.Core\FileScanner.cs
 04_Source\src\WindowsDiskCleaner.Core\FileFilter.cs
+04_Source\src\WindowsDiskCleaner.Core\FileFilterOptions.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskClassifier.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskLevel.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskAssessment.cs
@@ -163,6 +174,7 @@ App:
 04_Source\src\WindowsDiskCleaner.App\FileEntryViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\FolderTreeNodeViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\QuickFilterOption.cs
+04_Source\src\WindowsDiskCleaner.App\RiskFilterOption.cs
 ```
 
 Build:
@@ -174,9 +186,8 @@ Build:
 
 ## Suggested Next Phase
 
-Continue with P7 safety/detail polish:
+Recommended P8 options:
 
-1. Manual UI acceptance for P6 batch delete.
-2. Add selected-file risk detail display.
-3. Add color/icon hints for risk levels.
-4. Add risk-level filter.
+1. Add color/icon hints for risk levels.
+2. Add duplicate-file detection.
+3. Add visual storage analysis.

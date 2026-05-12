@@ -10,7 +10,7 @@ namespace WindowsDiskCleaner.App
     {
         public MainWindow()
         {
-            Title = "File Scanner P6 - Batch Delete";
+            Title = "File Scanner P7 - Risk Filter";
             Width = 1240;
             Height = 720;
             MinWidth = 980;
@@ -141,12 +141,33 @@ namespace WindowsDiskCleaner.App
                 Padding = new Thickness(10),
                 Margin = new Thickness(0, 12, 0, 0)
             };
+            var statusPanel = new StackPanel();
+
+            var riskDetail = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 4)
+            };
+            riskDetail.SetBinding(TextBlock.TextProperty, new Binding("SelectedFileRiskDetail"));
+            statusPanel.Children.Add(riskDetail);
+
+            var pathDetail = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = new SolidColorBrush(Color.FromRgb(88, 96, 105)),
+                Margin = new Thickness(0, 0, 0, 6)
+            };
+            pathDetail.SetBinding(TextBlock.TextProperty, new Binding("SelectedFilePathDetail"));
+            statusPanel.Children.Add(pathDetail);
+
             var status = new TextBlock
             {
                 TextWrapping = TextWrapping.Wrap
             };
             status.SetBinding(TextBlock.TextProperty, new Binding("StatusText"));
-            statusBorder.Child = status;
+            statusPanel.Children.Add(status);
+            statusBorder.Child = statusPanel;
             Grid.SetRow(statusBorder, 5);
             root.Children.Add(statusBorder);
 
@@ -295,11 +316,12 @@ namespace WindowsDiskCleaner.App
                 Margin = new Thickness(0, 0, 0, 12)
             };
 
-            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) });
-            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });
-            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
             panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
-            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) });
+            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(92) });
+            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });
+            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
+            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(160) });
+            panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
             panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(96) });
             panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
@@ -333,13 +355,27 @@ namespace WindowsDiskCleaner.App
             panel.Children.Add(quick);
             AddLabel(panel, "\u5feb\u6377\u7b5b\u9009", 4);
 
+            var risk = new ComboBox
+            {
+                Margin = new Thickness(8, 18, 0, 0),
+                DisplayMemberPath = "Label"
+            };
+            risk.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("RiskFilters"));
+            risk.SetBinding(Selector.SelectedItemProperty, new Binding("SelectedRiskFilter")
+            {
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            Grid.SetColumn(risk, 5);
+            panel.Children.Add(risk);
+            AddLabel(panel, "\u6587\u4ef6\u7ea7\u522b", 5);
+
             var clear = new Button
             {
                 Content = "\u6e05\u9664\u7b5b\u9009",
                 Margin = new Thickness(8, 18, 0, 0)
             };
             clear.SetBinding(Button.CommandProperty, new Binding("ClearFiltersCommand"));
-            Grid.SetColumn(clear, 5);
+            Grid.SetColumn(clear, 6);
             panel.Children.Add(clear);
 
             return panel;
