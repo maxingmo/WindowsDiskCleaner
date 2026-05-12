@@ -20,6 +20,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskAssessment.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskClassifier.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskLevel.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\FileRiskVisualProfile.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileScanner.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FolderTreeBuilder.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FolderTreeNode.cs'),

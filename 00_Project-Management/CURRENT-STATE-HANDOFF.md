@@ -100,6 +100,16 @@ Delivered:
 - selected-file full path display in the bottom status area
 - fixed quick-filter Chinese labels
 
+### P8: Risk Visual Hints
+
+Delivered:
+
+- unified Core risk visual profile
+- list-view risk level column with color hint background
+- folder-view file nodes with matching risk color hints
+- WPF hex-color binding converter
+- no change to delete behavior
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -143,8 +153,8 @@ Run app:
 Latest verified status:
 
 ```text
-31 core tests passed.
-App build verified with title: File Scanner P7 - Risk Filter.
+33 core tests passed.
+App build verified with title: File Scanner P8 - Risk Visual Hints.
 ```
 
 ## Key Source Files
@@ -158,6 +168,7 @@ Core:
 04_Source\src\WindowsDiskCleaner.Core\FileRiskClassifier.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskLevel.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskAssessment.cs
+04_Source\src\WindowsDiskCleaner.Core\FileRiskVisualProfile.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeBuilder.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNode.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNodeType.cs
@@ -173,6 +184,7 @@ App:
 04_Source\src\WindowsDiskCleaner.App\MainWindowViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\FileEntryViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\FolderTreeNodeViewModel.cs
+04_Source\src\WindowsDiskCleaner.App\HexBrushConverter.cs
 04_Source\src\WindowsDiskCleaner.App\QuickFilterOption.cs
 04_Source\src\WindowsDiskCleaner.App\RiskFilterOption.cs
 ```
@@ -186,8 +198,8 @@ Build:
 
 ## Suggested Next Phase
 
-Recommended P8 options:
+Recommended P9 options:
 
-1. Add color/icon hints for risk levels.
-2. Add duplicate-file detection.
-3. Add visual storage analysis.
+1. Add duplicate-file detection.
+2. Add visual storage analysis.
+3. Add installer packaging.

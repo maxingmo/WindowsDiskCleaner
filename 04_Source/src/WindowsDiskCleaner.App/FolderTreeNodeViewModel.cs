@@ -45,7 +45,7 @@ namespace WindowsDiskCleaner.App
                 {
                     return "[FILE] " + _node.Name
                         + " | " + FormatSize(_node.SizeBytes)
-                        + " | " + (_fileEntry == null ? string.Empty : _fileEntry.RiskLevelDisplay)
+                        + " | " + RiskDisplayText
                         + " | " + (_node.File == null ? string.Empty : _node.File.ModifiedAt.ToString("yyyy-MM-dd HH:mm"));
                 }
 
@@ -54,6 +54,26 @@ namespace WindowsDiskCleaner.App
                     + " | " + _node.FileCount + " \u4e2a\u6587\u4ef6"
                     + " | " + FormatSize(_node.SizeBytes);
             }
+        }
+
+        public string RiskDisplayText
+        {
+            get
+            {
+                return _fileEntry == null
+                    ? string.Empty
+                    : _fileEntry.RiskLevelDisplay + " / " + _fileEntry.RiskBadgeText;
+            }
+        }
+
+        public string RiskForegroundHex
+        {
+            get { return _fileEntry == null ? "#374151" : _fileEntry.RiskForegroundHex; }
+        }
+
+        public string RiskBackgroundHex
+        {
+            get { return _fileEntry == null ? "#ffffff" : _fileEntry.RiskBackgroundHex; }
         }
 
         public static FolderTreeNodeViewModel Create(

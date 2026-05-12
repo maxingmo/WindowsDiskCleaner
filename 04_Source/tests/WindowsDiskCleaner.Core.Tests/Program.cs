@@ -30,6 +30,8 @@ namespace WindowsDiskCleaner.Core.Tests
                 RiskClassifierMarksUserKnownFoldersAsUserData,
                 RiskClassifierMarksCacheAndLogsAsTemporary,
                 RiskClassifierMarksUnknownPathsAsCaution,
+                RiskVisualProfileMarksHighRiskLevels,
+                RiskVisualProfileMarksCacheAsCleanupCandidate,
                 DeleteServiceRejectsUnconfirmedNormalFile,
                 DeleteServiceDeletesConfirmedNormalFile,
                 DeleteServiceRequiresHighRiskConfirmation,
@@ -325,6 +327,26 @@ namespace WindowsDiskCleaner.Core.Tests
             var result = classifier.Classify(entry);
 
             AssertEqual(FileRiskLevel.UnknownCaution, result.Level, "risk level");
+        }
+
+        private static void RiskVisualProfileMarksHighRiskLevels()
+        {
+            var system = FileRiskVisualProfile.ForLevel(FileRiskLevel.System);
+            var program = FileRiskVisualProfile.ForLevel(FileRiskLevel.ProgramInstall);
+
+            AssertTrue(system.IsHighRisk, "system should be high risk");
+            AssertTrue(program.IsHighRisk, "program install should be high risk");
+            AssertEqual("\u9ad8\u98ce\u9669", system.BadgeText, "system badge");
+            AssertEqual("#fee2e2", system.BackgroundHex, "system background");
+        }
+
+        private static void RiskVisualProfileMarksCacheAsCleanupCandidate()
+        {
+            var cache = FileRiskVisualProfile.ForLevel(FileRiskLevel.CacheTemporary);
+
+            AssertTrue(!cache.IsHighRisk, "cache should not be high risk");
+            AssertEqual("\u53ef\u6e05\u7406", cache.BadgeText, "cache badge");
+            AssertEqual("#dcfce7", cache.BackgroundHex, "cache background");
         }
 
         private static void DeleteServiceRejectsUnconfirmedNormalFile()

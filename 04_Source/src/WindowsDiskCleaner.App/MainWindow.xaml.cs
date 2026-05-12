@@ -8,9 +8,11 @@ namespace WindowsDiskCleaner.App
 {
     public sealed class MainWindow : Window
     {
+        private static readonly HexBrushConverter HexBrushConverter = new HexBrushConverter();
+
         public MainWindow()
         {
-            Title = "File Scanner P7 - Risk Filter";
+            Title = "File Scanner P8 - Risk Visual Hints";
             Width = 1240;
             Height = 720;
             MinWidth = 980;
@@ -122,7 +124,7 @@ namespace WindowsDiskCleaner.App
                 Width = 58
             });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u540d", Binding = new Binding("Name"), Width = 190 });
-            grid.Columns.Add(new DataGridTextColumn { Header = "\u6587\u4ef6\u7ea7\u522b", Binding = new Binding("RiskLevelDisplay"), Width = 120 });
+            grid.Columns.Add(CreateRiskColumn());
             grid.Columns.Add(new DataGridTextColumn { Header = "\u5927\u5c0f", Binding = new Binding("SizeDisplay"), SortMemberPath = "SizeBytes", Width = 100 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u6269\u5c55\u540d", Binding = new Binding("Extension"), Width = 90 });
             grid.Columns.Add(new DataGridTextColumn { Header = "\u521b\u5efa\u65f6\u95f4", Binding = new Binding("CreatedAt"), Width = 150 });
@@ -201,6 +203,45 @@ namespace WindowsDiskCleaner.App
             panel.Children.Add(summary);
 
             return panel;
+        }
+
+        private static DataGridTemplateColumn CreateRiskColumn()
+        {
+            var template = new DataTemplate();
+
+            var border = new FrameworkElementFactory(typeof(Border));
+            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
+            border.SetValue(Border.PaddingProperty, new Thickness(6, 2, 6, 2));
+            border.SetValue(Border.MarginProperty, new Thickness(0, 2, 6, 2));
+            border.SetBinding(Border.BackgroundProperty, new Binding("RiskBackgroundHex")
+            {
+                Converter = HexBrushConverter
+            });
+            border.SetBinding(Border.BorderBrushProperty, new Binding("RiskBorderHex")
+            {
+                Converter = HexBrushConverter
+            });
+            border.SetValue(Border.BorderThicknessProperty, new Thickness(1));
+
+            var text = new FrameworkElementFactory(typeof(TextBlock));
+            text.SetBinding(TextBlock.TextProperty, new Binding("RiskLevelDisplay"));
+            text.SetBinding(TextBlock.ForegroundProperty, new Binding("RiskForegroundHex")
+            {
+                Converter = HexBrushConverter
+            });
+            text.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            text.SetValue(TextBlock.TextAlignmentProperty, TextAlignment.Center);
+
+            border.AppendChild(text);
+            template.VisualTree = border;
+
+            return new DataGridTemplateColumn
+            {
+                Header = "\u6587\u4ef6\u7ea7\u522b",
+                CellTemplate = template,
+                SortMemberPath = "RiskLevelDisplay",
+                Width = 128
+            };
         }
 
         private static Button CreateBatchButton(string text, string commandPath)
@@ -287,6 +328,15 @@ namespace WindowsDiskCleaner.App
             text.SetBinding(TextBlock.TextProperty, new Binding("DisplayText"));
             text.SetBinding(FrameworkElement.ToolTipProperty, new Binding("FullPath"));
             text.SetValue(TextBlock.MarginProperty, new Thickness(2, 3, 2, 3));
+            text.SetValue(TextBlock.PaddingProperty, new Thickness(4, 1, 4, 1));
+            text.SetBinding(TextBlock.ForegroundProperty, new Binding("RiskForegroundHex")
+            {
+                Converter = HexBrushConverter
+            });
+            text.SetBinding(TextBlock.BackgroundProperty, new Binding("RiskBackgroundHex")
+            {
+                Converter = HexBrushConverter
+            });
 
             template.VisualTree = text;
             return template;

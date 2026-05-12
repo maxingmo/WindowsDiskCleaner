@@ -8,12 +8,14 @@ namespace WindowsDiskCleaner.App
     {
         private readonly FileEntry _entry;
         private readonly FileRiskAssessment _riskAssessment;
+        private readonly FileRiskVisualProfile _riskVisualProfile;
         private bool _isSelected;
 
         public FileEntryViewModel(FileEntry entry)
         {
             _entry = entry;
             _riskAssessment = new FileRiskClassifier().Classify(entry);
+            _riskVisualProfile = FileRiskVisualProfile.ForLevel(_riskAssessment.Level);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -61,9 +63,29 @@ namespace WindowsDiskCleaner.App
             get { return _riskAssessment.Reason; }
         }
 
+        public string RiskBadgeText
+        {
+            get { return _riskVisualProfile.BadgeText; }
+        }
+
+        public string RiskForegroundHex
+        {
+            get { return _riskVisualProfile.ForegroundHex; }
+        }
+
+        public string RiskBackgroundHex
+        {
+            get { return _riskVisualProfile.BackgroundHex; }
+        }
+
+        public string RiskBorderHex
+        {
+            get { return _riskVisualProfile.BorderHex; }
+        }
+
         public bool IsHighRisk
         {
-            get { return _riskAssessment.Level == FileRiskLevel.System || _riskAssessment.Level == FileRiskLevel.ProgramInstall; }
+            get { return _riskVisualProfile.IsHighRisk; }
         }
 
         public FileEntry Entry

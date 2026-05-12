@@ -49,6 +49,7 @@ Run app:
 - `FileScanner`: recursive filesystem scanning with cancellation and IO error collection.
 - `FileFilter`: in-memory filtering for scanned results.
 - `FileRiskClassifier`: conservative file risk-level classification.
+- `FileRiskVisualProfile`: risk-level visual badge and color configuration.
 - `FolderTreeBuilder`: builds a folder/file tree from the current filtered file list without rescanning.
 - `FileDeletionService`: validates single-file delete confirmation level before moving files through the delete adapter.
 - `FileBatchDeletionService`: validates batch delete confirmation level before moving checked files through the delete adapter.
@@ -60,6 +61,7 @@ Run app:
 - `MainWindowViewModel`: scan, filter, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
 - `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
 - `FolderTreeNodeViewModel`: tree row projection for folder view.
+- `HexBrushConverter`: WPF binding converter for Core hex color values.
 - `QuickFilterOption`: UI model for common filter groups.
 - `RiskFilterOption`: UI model for file risk-level filtering.
 

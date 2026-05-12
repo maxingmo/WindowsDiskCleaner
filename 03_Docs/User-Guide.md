@@ -52,6 +52,18 @@ Text filters use a short delay to keep typing smooth.
 
 Switching views does not rescan the disk. Filters affect both views.
 
+## Risk Visual Hints
+
+The `文件级别` column uses visual hints:
+
+- `系统级`: red high-risk hint.
+- `程序安装级`: orange high-risk hint.
+- `用户数据级`: blue user-file hint.
+- `缓存/临时级`: green cleanup-candidate hint.
+- `未知/谨慎级`: neutral caution hint.
+
+In `文件夹视图`, file nodes use the same risk color family. Folder nodes remain neutral.
+
 ## Batch Delete
 
 In `列表视图`:
@@ -66,14 +78,6 @@ Batch delete shows a summary with selected count, total size, and high-risk coun
 ## File Level and Risk Details
 
 The `文件级别` column is a safety hint, not a delete decision.
-
-Levels:
-
-- `系统级`: Windows/system paths. Treat as high risk.
-- `程序安装级`: installed application files or installer-like locations. Treat as high risk.
-- `用户数据级`: documents, downloads, pictures, videos, desktop, and similar user files.
-- `缓存/临时级`: cache, temp, log, backup, and temporary-looking files.
-- `未知/谨慎级`: unmatched files. Review carefully.
 
 When a file is selected, the bottom status area shows the level, risk reason, and full path.
 

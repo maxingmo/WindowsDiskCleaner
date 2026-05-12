@@ -35,6 +35,7 @@ The runnable prototype is currently published locally as:
   - User Data Level
   - Cache/Temporary Level
   - Unknown/Caution Level
+- Highlight risk levels with visual hints in list and folder views.
 - Show selected-file risk details before deletion.
 - Delete a selected file or checked files to the Windows Recycle Bin.
 - Require an extra confirmation for system-level and program-install-level files.
@@ -50,6 +51,7 @@ Completed:
 - P5A: Folder Tree View Mode
 - P6: Batch Selection and Batch Delete
 - P7: Risk Filter and Risk Details
+- P8: Risk Visual Hints
 
 Not yet implemented:
 
@@ -102,16 +104,16 @@ Run app:
 
 ## Latest Verified State
 
-- 31 core tests passed.
+- 33 core tests passed.
 - App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
-- Current title: `File Scanner P7 - Risk Filter`.
+- Current title: `File Scanner P8 - Risk Visual Hints`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps
 
 Recommended next work:
 
-1. Manual UI acceptance for P7 risk filter and selected-file detail display.
-2. Add color/icon hints for risk levels.
-3. Add duplicate-file detection.
-4. Add visual storage analysis.
+1. Manual UI acceptance for P8 risk visual hints.
+2. Add duplicate-file detection.
+3. Add visual storage analysis.
+4. Add installer packaging.
