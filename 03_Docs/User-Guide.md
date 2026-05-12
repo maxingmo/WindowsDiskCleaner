@@ -34,10 +34,24 @@ D:\AI Workspaces\WindowsDiskCleaner
 
 ## Main Window Layout
 
-- Top area: scan path and primary actions.
+- Left navigation: shows the current cleanup-oriented information architecture. In this phase, only the disk scan page is active.
+- Scan overview: shows scanned/visible capacity, checked capacity, file count, scan path, and primary actions.
 - Filter area: keyword, extension, size, date, quick filter, and risk-level filter.
-- Results area: view switching, batch actions, list view, and folder view.
+- Cleanup category area: summarizes the current visible results into high-risk, cache/temporary, user data, large files, and unknown/caution cards.
+- Detailed results area: view switching, batch actions, list view, and folder view.
 - Details area: selected-file risk/path information and current running status.
+
+## Cleanup Category Cards
+
+The cleanup category cards are summary cards only. They help you understand what kind of files are visible after the current scan and filters.
+
+- `高风险`: system-level and program-install-level files. Review carefully before deleting.
+- `缓存/临时`: cache, log, and temporary files.
+- `用户数据`: downloads, pictures, documents, and other user data.
+- `大文件`: files at or above 100 MB. This category is for space analysis and may overlap with other categories.
+- `未知/谨慎`: files that do not match a clearer category.
+
+In P9B, clicking a card does not yet apply a filter or delete anything.
 
 ## Filters
 
@@ -93,3 +107,4 @@ Batch delete shows a summary with selected count, total size, and high-risk coun
 ## Current Limitation
 
 Folder-level deletion is not implemented yet.
+Category-card click filtering is not implemented yet.

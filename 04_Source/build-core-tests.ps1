@@ -8,6 +8,9 @@ $outFile = Join-Path $outDir 'WindowsDiskCleanerCoreTests.dll'
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
 $sources = @(
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategoryKind.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategorySummary.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategorySummaryBuilder.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\DebouncedAction.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeleteResult.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeletionService.cs'),

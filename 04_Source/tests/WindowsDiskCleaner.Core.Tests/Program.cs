@@ -32,6 +32,8 @@ namespace WindowsDiskCleaner.Core.Tests
                 RiskClassifierMarksUnknownPathsAsCaution,
                 RiskVisualProfileMarksHighRiskLevels,
                 RiskVisualProfileMarksCacheAsCleanupCandidate,
+                CleanupCategorySummaryGroupsFilesByCategory,
+                CleanupCategorySummaryHandlesEmptyInput,
                 DeleteServiceRejectsUnconfirmedNormalFile,
                 DeleteServiceDeletesConfirmedNormalFile,
                 DeleteServiceRequiresHighRiskConfirmation,
@@ -347,6 +349,38 @@ namespace WindowsDiskCleaner.Core.Tests
             AssertTrue(!cache.IsHighRisk, "cache should not be high risk");
             AssertEqual("\u53ef\u6e05\u7406", cache.BadgeText, "cache badge");
             AssertEqual("#dcfce7", cache.BackgroundHex, "cache background");
+        }
+
+        private static void CleanupCategorySummaryGroupsFilesByCategory()
+        {
+            var builder = new CleanupCategorySummaryBuilder();
+
+            var result = builder.Build(new[]
+            {
+                new FileEntry("kernel.dll", @"C:\Windows\System32\kernel.dll", 10, DateTime.Now, DateTime.Now, ".dll"),
+                new FileEntry("trace.log", @"C:\Users\Alice\AppData\Local\Vendor\Cache\trace.log", 20, DateTime.Now, DateTime.Now, ".log"),
+                new FileEntry("photo.jpg", @"C:\Users\Alice\Pictures\photo.jpg", 30, DateTime.Now, DateTime.Now, ".jpg"),
+                new FileEntry("movie.mp4", @"D:\Media\movie.mp4", 700L * 1024L * 1024L, DateTime.Now, DateTime.Now, ".mp4"),
+                new FileEntry("data.bin", @"D:\Unsorted\data.bin", 40, DateTime.Now, DateTime.Now, ".bin")
+            }).ToList();
+
+            AssertEqual(5, result.Count, "category count");
+            AssertEqual(CleanupCategoryKind.HighRisk, result[0].Kind, "first category kind");
+            AssertEqual(1, result[0].FileCount, "high risk count");
+            AssertEqual(10L, result[0].TotalBytes, "high risk size");
+            AssertEqual(CleanupCategoryKind.LargeFiles, result[3].Kind, "large files category kind");
+            AssertEqual(1, result[3].FileCount, "large files count");
+        }
+
+        private static void CleanupCategorySummaryHandlesEmptyInput()
+        {
+            var builder = new CleanupCategorySummaryBuilder();
+
+            var result = builder.Build(new FileEntry[0]).ToList();
+
+            AssertEqual(5, result.Count, "empty category count");
+            AssertTrue(result.All(category => category.FileCount == 0), "empty file counts");
+            AssertTrue(result.All(category => category.TotalBytes == 0), "empty total bytes");
         }
 
         private static void DeleteServiceRejectsUnconfirmedNormalFile()

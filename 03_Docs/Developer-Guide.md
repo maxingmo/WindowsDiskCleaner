@@ -50,6 +50,7 @@ Run app:
 - `FileFilter`: in-memory filtering for scanned results.
 - `FileRiskClassifier`: conservative file risk-level classification.
 - `FileRiskVisualProfile`: risk-level visual badge and color configuration.
+- `CleanupCategorySummaryBuilder`: builds cleanup-home category summaries from the current visible file list.
 - `FolderTreeBuilder`: builds a folder/file tree from the current filtered file list without rescanning.
 - `FileDeletionService`: validates single-file delete confirmation level before moving files through the delete adapter.
 - `FileBatchDeletionService`: validates batch delete confirmation level before moving checked files through the delete adapter.
@@ -57,8 +58,9 @@ Run app:
 
 ## UI Components
 
-- `MainWindow`: code-built WPF shell, organized into top operation, filter, results, and details sections.
-- `MainWindowViewModel`: scan, filter, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
+- `MainWindow`: code-built WPF shell, organized into left navigation, scan overview, filter, cleanup category, detailed results, and details sections.
+- `MainWindowViewModel`: scan, filter, cleanup category summaries, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
+- `CleanupCategoryCardViewModel`: app-facing projection for cleanup category cards.
 - `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
 - `FolderTreeNodeViewModel`: tree row projection for folder view.
 - `HexBrushConverter`: WPF binding converter for Core hex color values.
@@ -75,3 +77,10 @@ powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04
 ```
 
 Then launch `FileScannerP2.exe` and confirm the main window opens manually when automated launch is blocked by local Windows security policy.
+
+## P9B Notes
+
+- Cleanup category cards are derived from the current visible filtered results.
+- The large-file category uses a 100 MB threshold and is allowed to overlap with risk-based categories.
+- Category cards are informational in P9B; they do not invoke delete or filtering commands.
+- Keep all Chinese UI strings in `.cs` files as Unicode escape sequences to avoid source encoding corruption.

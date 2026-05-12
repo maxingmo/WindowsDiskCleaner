@@ -1,6 +1,6 @@
 # WindowsDiskCleaner
 
-WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, folder-style result browsing, deletion-risk hints, and safe recycle-bin deletion for single or checked files.
+WindowsDiskCleaner is an early-stage Windows disk file scanner and cleanup-safety tool. The current build focuses on fast local file discovery, filtering, cleanup-style category summaries, folder-style result browsing, deletion-risk hints, and safe recycle-bin deletion for single or checked files.
 
 The runnable prototype is currently published locally as:
 
@@ -36,7 +36,13 @@ The runnable prototype is currently published locally as:
   - Cache/Temporary Level
   - Unknown/Caution Level
 - Highlight risk levels with visual hints in list and folder views.
-- Organize the main window into operation, filter, result, and detail sections.
+- Organize the main window into a cleanup-home layout with left navigation, scan overview, cleanup category cards, detailed results, and detail/status sections.
+- Summarize visible results into cleanup categories:
+  - High Risk
+  - Cache/Temporary
+  - User Data
+  - Large Files
+  - Unknown/Caution
 - Show selected-file risk details before deletion.
 - Delete a selected file or checked files to the Windows Recycle Bin.
 - Require an extra confirmation for system-level and program-install-level files.
@@ -54,6 +60,7 @@ Completed:
 - P7: Risk Filter and Risk Details
 - P8: Risk Visual Hints
 - P9A: Main UI Layout Refresh
+- P9B: Cleanup Home Inspired Layout
 
 Not yet implemented:
 
@@ -106,16 +113,17 @@ Run app:
 
 ## Latest Verified State
 
-- 33 core tests passed.
+- 35 core tests passed.
 - App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
-- Current title: `File Scanner P9A - UI Layout`.
+- Current title: `File Scanner P9B - Cleanup Home`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps
 
 Recommended next work:
 
-1. Manual UI acceptance for P9A layout changes.
-2. Continue UI polish for folder tree text and table styling.
-3. Add duplicate-file detection.
-4. Add visual storage analysis.
+1. Manual UI acceptance for P9B cleanup-home layout changes.
+2. Add click-to-filter behavior for cleanup category cards.
+3. Continue UI polish for folder tree text and table styling.
+4. Add duplicate-file detection.
+5. Add visual storage analysis.

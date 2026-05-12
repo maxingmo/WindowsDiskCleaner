@@ -18,6 +18,7 @@ namespace WindowsDiskCleaner.App
         private readonly FileScanner _scanner;
         private readonly FileFilter _filter;
         private readonly FolderTreeBuilder _folderTreeBuilder;
+        private readonly CleanupCategorySummaryBuilder _categorySummaryBuilder;
         private readonly FileDeletionService _deletionService;
         private readonly FileBatchDeletionService _batchDeletionService;
         private readonly List<FileEntry> _allFiles;
@@ -40,11 +41,13 @@ namespace WindowsDiskCleaner.App
             _scanner = new FileScanner();
             _filter = new FileFilter();
             _folderTreeBuilder = new FolderTreeBuilder();
+            _categorySummaryBuilder = new CleanupCategorySummaryBuilder();
             _deletionService = new FileDeletionService(new RecycleBinDeleteAdapter());
             _batchDeletionService = new FileBatchDeletionService(new RecycleBinDeleteAdapter());
             _allFiles = new List<FileEntry>();
             Files = new ObservableCollection<FileEntryViewModel>();
             FolderTree = new ObservableCollection<FolderTreeNodeViewModel>();
+            CleanupCategories = new ObservableCollection<CleanupCategoryCardViewModel>();
             QuickFilters = new ObservableCollection<QuickFilterOption>(QuickFilterOption.CreateDefaults());
             RiskFilters = new ObservableCollection<RiskFilterOption>(RiskFilterOption.CreateDefaults());
             _selectedQuickFilter = QuickFilters[0];
@@ -66,6 +69,8 @@ namespace WindowsDiskCleaner.App
         public ObservableCollection<FileEntryViewModel> Files { get; private set; }
 
         public ObservableCollection<FolderTreeNodeViewModel> FolderTree { get; private set; }
+
+        public ObservableCollection<CleanupCategoryCardViewModel> CleanupCategories { get; private set; }
 
         public ObservableCollection<QuickFilterOption> QuickFilters { get; private set; }
 
@@ -95,6 +100,21 @@ namespace WindowsDiskCleaner.App
         public string CheckedFileSummary
         {
             get { return "\u5df2\u9009 " + CheckedFileCount + " \u4e2a\u6587\u4ef6"; }
+        }
+
+        public string ReclaimableSummary
+        {
+            get { return FormatSize(_allFiles.Sum(file => file.SizeBytes)) + " \u53ef\u67e5\u770b"; }
+        }
+
+        public string SelectedSizeSummary
+        {
+            get { return FormatSize(Files.Where(file => file.IsSelected).Sum(file => file.SizeBytes)) + " \u5df2\u9009"; }
+        }
+
+        public string ScanOverviewSummary
+        {
+            get { return _allFiles.Count + " \u4e2a\u6587\u4ef6"; }
         }
 
         public FileEntryViewModel SelectedFile
@@ -339,9 +359,11 @@ namespace WindowsDiskCleaner.App
             _allFiles.Clear();
             Files.Clear();
             FolderTree.Clear();
+            CleanupCategories.Clear();
             SelectedFile = null;
             SelectedFolderTreeNode = null;
             NotifyCheckedSelectionChanged();
+            NotifyOverviewChanged();
             IsScanning = true;
             _cancellation = new CancellationTokenSource();
             StatusText = "\u6b63\u5728\u626b\u63cf...";
@@ -409,6 +431,7 @@ namespace WindowsDiskCleaner.App
             var options = BuildFilterOptions();
             var visible = _filter.Apply(_allFiles, options).ToList();
             RebuildVisibleFiles(visible);
+            RebuildCleanupCategories(visible);
             StatusText = BuildStatus("\u7b5b\u9009\u7ed3\u679c", visible.Count, _allFiles.Count, visible.Sum(file => file.SizeBytes), 0);
         }
 
@@ -632,6 +655,8 @@ namespace WindowsDiskCleaner.App
                 FolderTree.Add(FolderTreeNodeViewModel.Create(node, filesByPath));
             }
 
+            RebuildCleanupCategories(visibleFiles);
+
             ClearSelectedFolderTreeNodeOnly();
 
             if (!string.IsNullOrWhiteSpace(selectedPath))
@@ -646,6 +671,17 @@ namespace WindowsDiskCleaner.App
 
             SelectedFile = null;
             NotifyCheckedSelectionChanged();
+        }
+
+        private void RebuildCleanupCategories(IEnumerable<FileEntry> files)
+        {
+            CleanupCategories.Clear();
+            foreach (var summary in _categorySummaryBuilder.Build(files))
+            {
+                CleanupCategories.Add(new CleanupCategoryCardViewModel(summary));
+            }
+
+            NotifyOverviewChanged();
         }
 
         private static string BuildStatus(string prefix, int visibleCount, int totalCount, long visibleBytes, int skippedCount)
@@ -725,7 +761,15 @@ namespace WindowsDiskCleaner.App
         {
             OnPropertyChanged("CheckedFileCount");
             OnPropertyChanged("CheckedFileSummary");
+            OnPropertyChanged("SelectedSizeSummary");
             RefreshCommands();
+        }
+
+        private void NotifyOverviewChanged()
+        {
+            OnPropertyChanged("ReclaimableSummary");
+            OnPropertyChanged("SelectedSizeSummary");
+            OnPropertyChanged("ScanOverviewSummary");
         }
 
         private enum ResultViewMode

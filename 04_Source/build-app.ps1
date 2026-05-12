@@ -26,6 +26,9 @@ $references = @(
 )
 
 $sources = @(
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategoryKind.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategorySummary.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.Core\CleanupCategorySummaryBuilder.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeleteResult.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileBatchDeletionService.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\FileDeleteConfirmation.cs'),
@@ -49,6 +52,7 @@ $sources = @(
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanProgress.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.Core\ScanResult.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\App.xaml.cs'),
+    (Join-Path $root 'src\WindowsDiskCleaner.App\CleanupCategoryCardViewModel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\FileEntryViewModel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\FolderTreeNodeViewModel.cs'),
     (Join-Path $root 'src\WindowsDiskCleaner.App\HexBrushConverter.cs'),

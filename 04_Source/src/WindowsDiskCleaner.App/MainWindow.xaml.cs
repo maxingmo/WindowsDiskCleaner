@@ -12,11 +12,11 @@ namespace WindowsDiskCleaner.App
 
         public MainWindow()
         {
-            Title = "File Scanner P9A - UI Layout";
-            Width = 1320;
-            Height = 780;
-            MinWidth = 1080;
-            MinHeight = 620;
+            Title = "File Scanner P9B - Cleanup Home";
+            Width = 1380;
+            Height = 820;
+            MinWidth = 1120;
+            MinHeight = 680;
             Background = CreateBrush(246, 248, 251);
             DataContext = new MainWindowViewModel();
             Content = BuildContent();
@@ -24,66 +24,163 @@ namespace WindowsDiskCleaner.App
 
         private static UIElement BuildContent()
         {
-            var root = new Grid
+            var root = new Grid();
+            root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(196) });
+            root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var navigation = BuildNavigation();
+            Grid.SetColumn(navigation, 0);
+            root.Children.Add(navigation);
+
+            var main = new Grid
             {
                 Margin = new Thickness(16)
             };
+            main.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            main.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            main.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            main.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            main.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            Grid.SetColumn(main, 1);
+            root.Children.Add(main);
 
-            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-            var topSection = BuildTopSection();
-            Grid.SetRow(topSection, 0);
-            root.Children.Add(topSection);
+            var overview = BuildOverviewSection();
+            Grid.SetRow(overview, 0);
+            main.Children.Add(overview);
 
             var filters = BuildFilterSection();
             Grid.SetRow(filters, 1);
-            root.Children.Add(filters);
+            main.Children.Add(filters);
+
+            var categories = BuildCategorySection();
+            Grid.SetRow(categories, 2);
+            main.Children.Add(categories);
 
             var results = BuildResultsSection();
-            Grid.SetRow(results, 2);
-            root.Children.Add(results);
+            Grid.SetRow(results, 3);
+            main.Children.Add(results);
 
             var details = BuildDetailsSection();
-            Grid.SetRow(details, 3);
-            root.Children.Add(details);
+            Grid.SetRow(details, 4);
+            main.Children.Add(details);
 
             return root;
         }
 
-        private static UIElement BuildTopSection()
+        private static UIElement BuildNavigation()
+        {
+            var border = new Border
+            {
+                Background = CreateBrush(0, 190, 124),
+                Padding = new Thickness(12, 18, 12, 18)
+            };
+
+            var panel = new StackPanel();
+            panel.Children.Add(new TextBlock
+            {
+                Text = "\u78c1\u76d8\u6e05\u7406",
+                Foreground = Brushes.White,
+                FontSize = 20,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(4, 0, 0, 26)
+            });
+
+            panel.Children.Add(CreateNavItem("\u78c1\u76d8\u626b\u63cf", true));
+            panel.Children.Add(CreateNavItem("\u91cd\u590d\u6587\u4ef6", false));
+            panel.Children.Add(CreateNavItem("\u5927\u6587\u4ef6\u5206\u6790", false));
+            panel.Children.Add(CreateNavItem("\u7f13\u5b58/\u4e34\u65f6", false));
+            panel.Children.Add(CreateNavItem("\u9690\u79c1\u75d5\u8ff9", false));
+            panel.Children.Add(CreateNavItem("\u8bbe\u7f6e", false));
+
+            border.Child = panel;
+            return border;
+        }
+
+        private static UIElement CreateNavItem(string text, bool isActive)
+        {
+            var border = new Border
+            {
+                Background = isActive ? CreateBrush(210, 250, 235) : Brushes.Transparent,
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(12, 14, 12, 14),
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            border.Child = new TextBlock
+            {
+                Text = text,
+                FontSize = 16,
+                FontWeight = isActive ? FontWeights.SemiBold : FontWeights.Normal,
+                Foreground = isActive ? CreateBrush(0, 150, 95) : Brushes.White
+            };
+
+            return border;
+        }
+
+        private static UIElement BuildOverviewSection()
         {
             var section = CreateSectionBorder(new Thickness(0, 0, 0, 12));
-            var panel = new Grid();
-            panel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            panel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var title = new TextBlock
+            var left = new StackPanel();
+            left.Children.Add(new TextBlock
             {
-                Text = "\u78c1\u76d8\u6587\u4ef6\u626b\u63cf",
-                FontSize = 22,
+                Text = "\u626b\u63cf\u6982\u89c8",
+                FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
-                Foreground = CreateBrush(17, 24, 39),
-                Margin = new Thickness(0, 0, 0, 12)
-            };
-            Grid.SetRow(title, 0);
-            panel.Children.Add(title);
+                Foreground = CreateBrush(75, 85, 99)
+            });
 
-            var toolbar = new Grid();
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var headline = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0, 8, 0, 8)
+            };
+
+            var reclaimable = new TextBlock
+            {
+                FontSize = 34,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = CreateBrush(31, 41, 55)
+            };
+            reclaimable.SetBinding(TextBlock.TextProperty, new Binding("ReclaimableSummary"));
+            headline.Children.Add(reclaimable);
+
+            var selected = new TextBlock
+            {
+                FontSize = 24,
+                Foreground = CreateBrush(107, 114, 128),
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(18, 0, 0, 4)
+            };
+            selected.SetBinding(TextBlock.TextProperty, new Binding("SelectedSizeSummary"));
+            headline.Children.Add(selected);
+            left.Children.Add(headline);
+
+            var overviewLine = new TextBlock
+            {
+                Foreground = CreateBrush(107, 114, 128),
+                FontSize = 13
+            };
+            overviewLine.SetBinding(TextBlock.TextProperty, new Binding("ScanOverviewSummary"));
+            left.Children.Add(overviewLine);
+
+            var pathRow = new Grid
+            {
+                Margin = new Thickness(0, 14, 0, 0)
+            };
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            pathRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             var pathLabel = CreateSmallLabel("\u626b\u63cf\u76ee\u5f55");
             pathLabel.VerticalAlignment = VerticalAlignment.Center;
             pathLabel.Margin = new Thickness(0, 0, 10, 0);
             Grid.SetColumn(pathLabel, 0);
-            toolbar.Children.Add(pathLabel);
+            pathRow.Children.Add(pathLabel);
 
             var pathBox = new TextBox
             {
@@ -99,35 +196,34 @@ namespace WindowsDiskCleaner.App
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
             Grid.SetColumn(pathBox, 1);
-            toolbar.Children.Add(pathBox);
+            pathRow.Children.Add(pathBox);
 
-            AddToolbarButton(toolbar, "\u9009\u62e9\u76ee\u5f55", "BrowseCommand", 2, ButtonTone.Neutral);
-            AddToolbarButton(toolbar, "\u5f00\u59cb\u626b\u63cf", "ScanCommand", 3, ButtonTone.Primary);
-            AddToolbarButton(toolbar, "\u53d6\u6d88", "CancelCommand", 4, ButtonTone.Neutral);
-            AddToolbarButton(toolbar, "\u5220\u9664\u6587\u4ef6", "DeleteSelectedCommand", 5, ButtonTone.Danger);
+            AddToolbarButton(pathRow, "\u9009\u62e9\u76ee\u5f55", "BrowseCommand", 2, ButtonTone.Neutral);
+            AddToolbarButton(pathRow, "\u53d6\u6d88", "CancelCommand", 3, ButtonTone.Neutral);
 
-            Grid.SetRow(toolbar, 1);
-            panel.Children.Add(toolbar);
+            left.Children.Add(pathRow);
+            Grid.SetColumn(left, 0);
+            grid.Children.Add(left);
 
-            section.Child = panel;
+            var actions = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(22, 0, 0, 0)
+            };
+            actions.Children.Add(CreateCommandButton("\u5f00\u59cb\u626b\u63cf", "ScanCommand", ButtonTone.Primary, 156, 48));
+            actions.Children.Add(CreateCommandButton("\u5220\u9664\u6587\u4ef6", "DeleteSelectedCommand", ButtonTone.Danger, 156, 38));
+            Grid.SetColumn(actions, 1);
+            grid.Children.Add(actions);
+
+            section.Child = grid;
             return section;
         }
 
         private static UIElement BuildFilterSection()
         {
             var section = CreateSectionBorder(new Thickness(0, 0, 0, 12));
-            var panel = new Grid();
-            panel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            panel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-            var title = CreateSectionTitle("\u7b5b\u9009\u6761\u4ef6");
-            Grid.SetRow(title, 0);
-            panel.Children.Add(title);
-
-            var filters = new Grid
-            {
-                Margin = new Thickness(0, 8, 0, 0)
-            };
+            var filters = new Grid();
 
             filters.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(170) });
             filters.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });
@@ -145,16 +241,117 @@ namespace WindowsDiskCleaner.App
             AddLabeledComboBox(filters, "\u5feb\u6377\u7b5b\u9009", "QuickFilters", "SelectedQuickFilter", 4);
             AddLabeledComboBox(filters, "\u6587\u4ef6\u7ea7\u522b", "RiskFilters", "SelectedRiskFilter", 5);
 
-            var clear = CreateCommandButton("\u6e05\u9664\u7b5b\u9009", "ClearFiltersCommand", ButtonTone.Neutral, 96);
+            var clear = CreateCommandButton("\u6e05\u9664\u7b5b\u9009", "ClearFiltersCommand", ButtonTone.Neutral, 96, 28);
             clear.Margin = new Thickness(8, 18, 0, 0);
             Grid.SetColumn(clear, 6);
             filters.Children.Add(clear);
 
-            Grid.SetRow(filters, 1);
-            panel.Children.Add(filters);
+            section.Child = filters;
+            return section;
+        }
 
+        private static UIElement BuildCategorySection()
+        {
+            var section = CreateSectionBorder(new Thickness(0, 0, 0, 12));
+            var panel = new StackPanel();
+            panel.Children.Add(CreateSectionTitle("\u6e05\u7406\u5206\u7c7b"));
+
+            var items = new ItemsControl
+            {
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+            items.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("CleanupCategories"));
+
+            var itemsPanel = new ItemsPanelTemplate();
+            var wrap = new FrameworkElementFactory(typeof(WrapPanel));
+            wrap.SetValue(WrapPanel.OrientationProperty, Orientation.Horizontal);
+            itemsPanel.VisualTree = wrap;
+            items.ItemsPanel = itemsPanel;
+            items.ItemTemplate = BuildCategoryCardTemplate();
+
+            panel.Children.Add(items);
             section.Child = panel;
             return section;
+        }
+
+        private static DataTemplate BuildCategoryCardTemplate()
+        {
+            var template = new DataTemplate(typeof(CleanupCategoryCardViewModel));
+
+            var border = new FrameworkElementFactory(typeof(Border));
+            border.SetValue(Border.WidthProperty, 190D);
+            border.SetValue(Border.MinHeightProperty, 118D);
+            border.SetValue(Border.MarginProperty, new Thickness(0, 0, 12, 12));
+            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
+            border.SetValue(Border.PaddingProperty, new Thickness(12));
+            border.SetValue(Border.BorderThicknessProperty, new Thickness(1));
+            border.SetValue(Border.BorderBrushProperty, CreateBrush(226, 232, 240));
+            border.SetBinding(Border.BackgroundProperty, new Binding("BackgroundHex")
+            {
+                Converter = HexBrushConverter
+            });
+
+            var stack = new FrameworkElementFactory(typeof(StackPanel));
+
+            var top = new FrameworkElementFactory(typeof(StackPanel));
+            top.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            top.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 8));
+
+            var icon = new FrameworkElementFactory(typeof(Border));
+            icon.SetValue(Border.WidthProperty, 34D);
+            icon.SetValue(Border.HeightProperty, 34D);
+            icon.SetValue(Border.CornerRadiusProperty, new CornerRadius(17));
+            icon.SetBinding(Border.BackgroundProperty, new Binding("AccentHex")
+            {
+                Converter = HexBrushConverter
+            });
+
+            var iconText = new FrameworkElementFactory(typeof(TextBlock));
+            iconText.SetBinding(TextBlock.TextProperty, new Binding("IconText"));
+            iconText.SetValue(TextBlock.ForegroundProperty, Brushes.White);
+            iconText.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            iconText.SetValue(TextBlock.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            iconText.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+            icon.AppendChild(iconText);
+            top.AppendChild(icon);
+
+            var title = new FrameworkElementFactory(typeof(TextBlock));
+            title.SetBinding(TextBlock.TextProperty, new Binding("Title"));
+            title.SetValue(TextBlock.FontSizeProperty, 15D);
+            title.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            title.SetValue(TextBlock.ForegroundProperty, CreateBrush(31, 41, 55));
+            title.SetValue(FrameworkElement.MarginProperty, new Thickness(8, 6, 0, 0));
+            top.AppendChild(title);
+
+            stack.AppendChild(top);
+
+            var size = new FrameworkElementFactory(typeof(TextBlock));
+            size.SetBinding(TextBlock.TextProperty, new Binding("SizeDisplay"));
+            size.SetValue(TextBlock.FontSizeProperty, 22D);
+            size.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            size.SetBinding(TextBlock.ForegroundProperty, new Binding("AccentHex")
+            {
+                Converter = HexBrushConverter
+            });
+            stack.AppendChild(size);
+
+            var count = new FrameworkElementFactory(typeof(TextBlock));
+            count.SetBinding(TextBlock.TextProperty, new Binding("CountDisplay"));
+            count.SetValue(TextBlock.ForegroundProperty, CreateBrush(75, 85, 99));
+            count.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 2, 0, 0));
+            stack.AppendChild(count);
+
+            var desc = new FrameworkElementFactory(typeof(TextBlock));
+            desc.SetBinding(TextBlock.TextProperty, new Binding("Description"));
+            desc.SetValue(TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+            desc.SetValue(TextBlock.FontSizeProperty, 11D);
+            desc.SetValue(TextBlock.ForegroundProperty, CreateBrush(107, 114, 128));
+            desc.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 8, 0, 0));
+            stack.AppendChild(desc);
+
+            border.AppendChild(stack);
+            template.VisualTree = border;
+            return template;
         }
 
         private static UIElement BuildResultsSection()
@@ -175,11 +372,8 @@ namespace WindowsDiskCleaner.App
             Grid.SetRow(resultsHost, 1);
             panel.Children.Add(resultsHost);
 
-            var grid = BuildFileGrid();
-            resultsHost.Children.Add(grid);
-
-            var tree = BuildFolderTree();
-            resultsHost.Children.Add(tree);
+            resultsHost.Children.Add(BuildFileGrid());
+            resultsHost.Children.Add(BuildFolderTree());
 
             section.Child = panel;
             return section;
@@ -196,7 +390,7 @@ namespace WindowsDiskCleaner.App
                 Orientation = Orientation.Horizontal,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            viewModes.Children.Add(CreateSmallLabel("\u7ed3\u679c\u89c6\u56fe"));
+            viewModes.Children.Add(CreateSmallLabel("\u8be6\u7ec6\u7ed3\u679c"));
             viewModes.Children.Add(CreateViewModeRadioButton("\u5217\u8868\u89c6\u56fe", "IsListView"));
             viewModes.Children.Add(CreateViewModeRadioButton("\u6587\u4ef6\u5939\u89c6\u56fe", "IsFolderView"));
             Grid.SetColumn(viewModes, 0);
@@ -213,9 +407,9 @@ namespace WindowsDiskCleaner.App
                 Converter = new BooleanToVisibilityConverter()
             });
 
-            batchTools.Children.Add(CreateCommandButton("\u5168\u9009\u5f53\u524d\u7ed3\u679c", "SelectAllVisibleCommand", ButtonTone.Neutral, 118));
-            batchTools.Children.Add(CreateCommandButton("\u6e05\u7a7a\u9009\u62e9", "ClearSelectionCommand", ButtonTone.Neutral, 96));
-            batchTools.Children.Add(CreateCommandButton("\u6279\u91cf\u5220\u9664", "DeleteCheckedCommand", ButtonTone.Danger, 96));
+            batchTools.Children.Add(CreateCommandButton("\u5168\u9009\u5f53\u524d\u7ed3\u679c", "SelectAllVisibleCommand", ButtonTone.Neutral, 118, 32));
+            batchTools.Children.Add(CreateCommandButton("\u6e05\u7a7a\u9009\u62e9", "ClearSelectionCommand", ButtonTone.Neutral, 96, 32));
+            batchTools.Children.Add(CreateCommandButton("\u6279\u91cf\u5220\u9664", "DeleteCheckedCommand", ButtonTone.Danger, 96, 32));
 
             var summary = new TextBlock
             {
@@ -509,7 +703,7 @@ namespace WindowsDiskCleaner.App
 
         private static void AddToolbarButton(Grid toolbar, string text, string commandPath, int column, ButtonTone tone)
         {
-            var button = CreateCommandButton(text, commandPath, tone, 96);
+            var button = CreateCommandButton(text, commandPath, tone, 96, 32);
             button.Margin = new Thickness(8, 0, 0, 0);
             Grid.SetColumn(button, column);
             toolbar.Children.Add(button);
@@ -535,12 +729,12 @@ namespace WindowsDiskCleaner.App
             return radioButton;
         }
 
-        private static Button CreateCommandButton(string text, string commandPath, ButtonTone tone, double minWidth)
+        private static Button CreateCommandButton(string text, string commandPath, ButtonTone tone, double minWidth, double height)
         {
             var button = new Button
             {
                 Content = text,
-                Height = 32,
+                Height = height,
                 MinWidth = minWidth,
                 Margin = new Thickness(0, 0, 8, 0),
                 Padding = new Thickness(10, 3, 10, 3),
@@ -549,9 +743,11 @@ namespace WindowsDiskCleaner.App
 
             if (tone == ButtonTone.Primary)
             {
-                button.Background = CreateBrush(37, 99, 235);
-                button.BorderBrush = CreateBrush(37, 99, 235);
+                button.Background = CreateBrush(0, 190, 124);
+                button.BorderBrush = CreateBrush(0, 170, 108);
                 button.Foreground = Brushes.White;
+                button.FontSize = 18;
+                button.FontWeight = FontWeights.SemiBold;
             }
             else if (tone == ButtonTone.Danger)
             {
@@ -588,7 +784,7 @@ namespace WindowsDiskCleaner.App
             return new TextBlock
             {
                 Text = text,
-                FontSize = 13,
+                FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
                 Foreground = CreateBrush(31, 41, 55)
             };

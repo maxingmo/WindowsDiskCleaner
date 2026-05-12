@@ -122,6 +122,20 @@ Delivered:
 - list view row height, header height, border, and alternating row background refined
 - no change to scan, filter, or delete behavior
 
+### P9B: Cleanup Home Inspired Layout
+
+Delivered:
+
+- main window reorganized into left navigation plus right cleanup-home content
+- green left navigation added, with the current disk scan page highlighted
+- top scan overview added for scanned/visible capacity, checked capacity, and file count
+- scan path and primary operations retained in the overview section
+- cleanup category cards added for high risk, cache/temporary, user data, large files, and unknown/caution
+- category summaries are rebuilt from current visible filtered results
+- detailed list and folder result views retained below the category cards
+- new Core cleanup category summary model and tests added
+- no change to scan, filter, or delete behavior
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -165,8 +179,8 @@ Run app:
 Latest verified status:
 
 ```text
-33 core tests passed.
-App build verified with title: File Scanner P9A - UI Layout.
+35 core tests passed.
+App build verified with title: File Scanner P9B - Cleanup Home.
 ```
 
 ## Key Source Files
@@ -181,6 +195,9 @@ Core:
 04_Source\src\WindowsDiskCleaner.Core\FileRiskLevel.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskAssessment.cs
 04_Source\src\WindowsDiskCleaner.Core\FileRiskVisualProfile.cs
+04_Source\src\WindowsDiskCleaner.Core\CleanupCategoryKind.cs
+04_Source\src\WindowsDiskCleaner.Core\CleanupCategorySummary.cs
+04_Source\src\WindowsDiskCleaner.Core\CleanupCategorySummaryBuilder.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeBuilder.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNode.cs
 04_Source\src\WindowsDiskCleaner.Core\FolderTreeNodeType.cs
@@ -194,6 +211,7 @@ App:
 ```text
 04_Source\src\WindowsDiskCleaner.App\MainWindow.xaml.cs
 04_Source\src\WindowsDiskCleaner.App\MainWindowViewModel.cs
+04_Source\src\WindowsDiskCleaner.App\CleanupCategoryCardViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\FileEntryViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\FolderTreeNodeViewModel.cs
 04_Source\src\WindowsDiskCleaner.App\HexBrushConverter.cs
@@ -210,8 +228,9 @@ Build:
 
 ## Suggested Next Phase
 
-Recommended P9B options:
+Recommended P10 options:
 
-1. Refine folder-tree display text to remove `[DIR]` / `[FILE]`.
-2. Add more polished table styles and selected-row styling.
+1. Add click-to-filter behavior for cleanup category cards.
+2. Refine folder-tree display text to remove `[DIR]` / `[FILE]`.
 3. Add duplicate-file detection.
+4. Add visual storage analysis.
