@@ -34,6 +34,7 @@ namespace WindowsDiskCleaner.App
         private DateTime? _modifiedBeforeFilter;
         private QuickFilterOption _selectedQuickFilter;
         private RiskFilterOption _selectedRiskFilter;
+        private CleanupCategoryKind? _selectedCleanupCategory;
         private bool _isScanning;
 
         public MainWindowViewModel()
@@ -61,6 +62,7 @@ namespace WindowsDiskCleaner.App
             SelectAllVisibleCommand = new RelayCommand(SelectAllVisibleFiles, CanSelectVisibleFiles);
             ClearSelectionCommand = new RelayCommand(ClearSelectedFiles, CanClearSelectedFiles);
             DeleteCheckedCommand = new RelayCommand(DeleteCheckedFiles, CanDeleteCheckedFiles);
+            SelectCleanupCategoryCommand = new RelayCommand<object>(SelectCleanupCategory, CanSelectCleanupCategory);
             StatusText = "\u8bf7\u9009\u62e9\u4e00\u4e2a\u76ee\u5f55\u5f00\u59cb\u626b\u63cf\u3002";
         }
 
@@ -92,6 +94,8 @@ namespace WindowsDiskCleaner.App
 
         public ICommand DeleteCheckedCommand { get; private set; }
 
+        public ICommand SelectCleanupCategoryCommand { get; private set; }
+
         public int CheckedFileCount
         {
             get { return Files.Count(file => file.IsSelected); }
@@ -114,7 +118,14 @@ namespace WindowsDiskCleaner.App
 
         public string ScanOverviewSummary
         {
-            get { return _allFiles.Count + " \u4e2a\u6587\u4ef6"; }
+            get
+            {
+                var categoryText = _selectedCleanupCategory.HasValue
+                    ? " | \u5206\u7c7b\u7b5b\u9009\uff1a" + GetCleanupCategoryLabel(_selectedCleanupCategory.Value)
+                    : string.Empty;
+
+                return _allFiles.Count + " \u4e2a\u6587\u4ef6" + categoryText;
+            }
         }
 
         public FileEntryViewModel SelectedFile
@@ -443,7 +454,8 @@ namespace WindowsDiskCleaner.App
                 Extension = ExtensionFilter,
                 ModifiedBefore = ModifiedBeforeFilter,
                 QuickFilter = SelectedQuickFilter == null ? QuickFileFilter.All : SelectedQuickFilter.Value,
-                RiskLevel = SelectedRiskFilter == null ? null : SelectedRiskFilter.Value
+                RiskLevel = SelectedRiskFilter == null ? null : SelectedRiskFilter.Value,
+                CleanupCategory = _selectedCleanupCategory
             };
 
             double minimumMb;
@@ -461,8 +473,10 @@ namespace WindowsDiskCleaner.App
             ExtensionFilter = string.Empty;
             MinimumSizeMbFilter = string.Empty;
             ModifiedBeforeFilter = null;
+            _selectedCleanupCategory = null;
             SelectedQuickFilter = QuickFilters[0];
             SelectedRiskFilter = RiskFilters[0];
+            OnPropertyChanged("ScanOverviewSummary");
             ApplyFilters();
         }
 
@@ -484,6 +498,26 @@ namespace WindowsDiskCleaner.App
         private bool CanDeleteCheckedFiles()
         {
             return !IsScanning && CheckedFileCount > 0;
+        }
+
+        private bool CanSelectCleanupCategory(object parameter)
+        {
+            return !IsScanning && _allFiles.Count > 0 && parameter is CleanupCategoryKind;
+        }
+
+        private void SelectCleanupCategory(object parameter)
+        {
+            if (!CanSelectCleanupCategory(parameter))
+            {
+                return;
+            }
+
+            var category = (CleanupCategoryKind)parameter;
+            _selectedCleanupCategory = _selectedCleanupCategory.HasValue && _selectedCleanupCategory.Value == category
+                ? (CleanupCategoryKind?)null
+                : category;
+
+            ApplyFilters();
         }
 
         private void SelectAllVisibleFiles()
@@ -678,7 +712,8 @@ namespace WindowsDiskCleaner.App
             CleanupCategories.Clear();
             foreach (var summary in _categorySummaryBuilder.Build(files))
             {
-                CleanupCategories.Add(new CleanupCategoryCardViewModel(summary));
+                var isActive = _selectedCleanupCategory.HasValue && _selectedCleanupCategory.Value == summary.Kind;
+                CleanupCategories.Add(new CleanupCategoryCardViewModel(summary, isActive));
             }
 
             NotifyOverviewChanged();
@@ -717,6 +752,7 @@ namespace WindowsDiskCleaner.App
             ((RelayCommand)SelectAllVisibleCommand).RaiseCanExecuteChanged();
             ((RelayCommand)ClearSelectionCommand).RaiseCanExecuteChanged();
             ((RelayCommand)DeleteCheckedCommand).RaiseCanExecuteChanged();
+            ((RelayCommand<object>)SelectCleanupCategoryCommand).RaiseCanExecuteChanged();
         }
 
         private void OnPropertyChanged(string propertyName)
@@ -776,6 +812,23 @@ namespace WindowsDiskCleaner.App
         {
             List,
             Folder
+        }
+
+        private static string GetCleanupCategoryLabel(CleanupCategoryKind category)
+        {
+            switch (category)
+            {
+                case CleanupCategoryKind.HighRisk:
+                    return "\u9ad8\u98ce\u9669";
+                case CleanupCategoryKind.CacheTemporary:
+                    return "\u7f13\u5b58/\u4e34\u65f6";
+                case CleanupCategoryKind.UserData:
+                    return "\u7528\u6237\u6570\u636e";
+                case CleanupCategoryKind.LargeFiles:
+                    return "\u5927\u6587\u4ef6";
+                default:
+                    return "\u672a\u77e5/\u8c28\u614e";
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ Run tests:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-core-tests.ps1"
+powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app-tests.ps1"
 ```
 
 Build app:
@@ -51,6 +52,7 @@ Run app:
 - `FileRiskClassifier`: conservative file risk-level classification.
 - `FileRiskVisualProfile`: risk-level visual badge and color configuration.
 - `CleanupCategorySummaryBuilder`: builds cleanup-home category summaries from the current visible file list.
+- `FileFilterOptions.CleanupCategory`: optional category filter used by cleanup-home cards.
 - `FolderTreeBuilder`: builds a folder/file tree from the current filtered file list without rescanning.
 - `FileDeletionService`: validates single-file delete confirmation level before moving files through the delete adapter.
 - `FileBatchDeletionService`: validates batch delete confirmation level before moving checked files through the delete adapter.
@@ -62,7 +64,7 @@ Run app:
 - `MainWindowViewModel`: scan, filter, cleanup category summaries, cancel, view mode, single delete, batch selection, batch delete, and status orchestration.
 - `CleanupCategoryCardViewModel`: app-facing projection for cleanup category cards.
 - `FileEntryViewModel`: table row projection, including risk-level display and checkbox selection state.
-- `FolderTreeNodeViewModel`: tree row projection for folder view.
+- `FolderTreeNodeViewModel`: tree row projection for folder view, with user-facing display text.
 - `HexBrushConverter`: WPF binding converter for Core hex color values.
 - `QuickFilterOption`: UI model for common filter groups.
 - `RiskFilterOption`: UI model for file risk-level filtering.
@@ -73,6 +75,7 @@ Before claiming a phase is done, run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-core-tests.ps1"
+powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app-tests.ps1"
 powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app.ps1"
 ```
 
@@ -82,5 +85,5 @@ Then launch `FileScannerP2.exe` and confirm the main window opens manually when 
 
 - Cleanup category cards are derived from the current visible filtered results.
 - The large-file category uses a 100 MB threshold and is allowed to overlap with risk-based categories.
-- Category cards are informational in P9B; they do not invoke delete or filtering commands.
+- Category cards can filter detailed results in P10A; they still never invoke delete commands.
 - Keep all Chinese UI strings in `.cs` files as Unicode escape sequences to avoid source encoding corruption.

@@ -136,6 +136,19 @@ Delivered:
 - new Core cleanup category summary model and tests added
 - no change to scan, filter, or delete behavior
 
+### P10A: Category Filter and Folder View Polish
+
+Delivered:
+
+- cleanup category cards are clickable filter entries
+- clicking the active category again clears the category filter
+- category cards show `点击筛选` / `已筛选`
+- active category card uses stronger border/background hints
+- scan overview shows the active category filter
+- folder tree display text no longer includes `[DIR]` / `[FILE]`
+- Core category-filter tests added
+- App display-text tests and `build-app-tests.ps1` added
+
 ## Important Environment Notes
 
 - Installing .NET 8 SDK failed because C drive had only about 50 MB free during installation.
@@ -170,6 +183,12 @@ Build app:
 powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app.ps1"
 ```
 
+Run app display tests:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "D:\AI Workspaces\WindowsDiskCleaner\04_Source\build-app-tests.ps1"
+```
+
 Run app:
 
 ```powershell
@@ -179,8 +198,9 @@ Run app:
 Latest verified status:
 
 ```text
-35 core tests passed.
-App build verified with title: File Scanner P9B - Cleanup Home.
+37 core tests passed.
+2 app display tests passed.
+App build verified with title: File Scanner P10A - UI Polish.
 ```
 
 ## Key Source Files
@@ -217,12 +237,14 @@ App:
 04_Source\src\WindowsDiskCleaner.App\HexBrushConverter.cs
 04_Source\src\WindowsDiskCleaner.App\QuickFilterOption.cs
 04_Source\src\WindowsDiskCleaner.App\RiskFilterOption.cs
+04_Source\src\WindowsDiskCleaner.App\RelayCommand.cs
 ```
 
 Build:
 
 ```text
 04_Source\build-core-tests.ps1
+04_Source\build-app-tests.ps1
 04_Source\build-app.ps1
 ```
 
@@ -230,7 +252,7 @@ Build:
 
 Recommended P10 options:
 
-1. Add click-to-filter behavior for cleanup category cards.
-2. Refine folder-tree display text to remove `[DIR]` / `[FILE]`.
+1. Refine folder tree into a more table-like tree result layout.
+2. Add empty/disabled states for cleanup category cards.
 3. Add duplicate-file detection.
 4. Add visual storage analysis.

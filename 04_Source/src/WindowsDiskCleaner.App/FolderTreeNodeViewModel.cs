@@ -43,13 +43,13 @@ namespace WindowsDiskCleaner.App
             {
                 if (IsFile)
                 {
-                    return "[FILE] " + _node.Name
+                    return _node.Name
                         + " | " + FormatSize(_node.SizeBytes)
                         + " | " + RiskDisplayText
                         + " | " + (_node.File == null ? string.Empty : _node.File.ModifiedAt.ToString("yyyy-MM-dd HH:mm"));
                 }
 
-                return "[DIR] " + _node.Name
+                return _node.Name
                     + " | " + _node.FullPath
                     + " | " + _node.FileCount + " \u4e2a\u6587\u4ef6"
                     + " | " + FormatSize(_node.SizeBytes);

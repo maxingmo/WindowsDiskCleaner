@@ -23,6 +23,8 @@ namespace WindowsDiskCleaner.Core.Tests
                 FilterAppliesQuickTypeAndCombinedRules,
                 FilterAppliesRiskLevel,
                 FilterDoesNotApplyRiskLevelWhenUnset,
+                FilterAppliesCleanupCategoryHighRisk,
+                FilterAppliesCleanupCategoryLargeFiles,
                 DebouncedActionDoesNotRunBeforeTimerElapsed,
                 DebouncedActionRunNowStopsTimerAndRunsImmediately,
                 RiskClassifierMarksWindowsPathAsSystem,
@@ -223,6 +225,29 @@ namespace WindowsDiskCleaner.Core.Tests
             var result = filter.Apply(files, new FileFilterOptions()).ToList();
 
             AssertEqual(files.Length, result.Count, "risk level unset count");
+        }
+
+        private static void FilterAppliesCleanupCategoryHighRisk()
+        {
+            var files = RiskSampleFiles();
+            var filter = new FileFilter();
+
+            var result = filter.Apply(files, new FileFilterOptions { CleanupCategory = CleanupCategoryKind.HighRisk }).ToList();
+
+            AssertEqual(2, result.Count, "high-risk cleanup category count");
+            AssertTrue(result.Any(file => file.Name == "kernel.dll"), "system file missing");
+            AssertTrue(result.Any(file => file.Name == "app.dll"), "program file missing");
+        }
+
+        private static void FilterAppliesCleanupCategoryLargeFiles()
+        {
+            var files = SampleFiles();
+            var filter = new FileFilter();
+
+            var result = filter.Apply(files, new FileFilterOptions { CleanupCategory = CleanupCategoryKind.LargeFiles }).ToList();
+
+            AssertEqual(2, result.Count, "large-file cleanup category count");
+            AssertTrue(result.All(file => file.SizeBytes >= 100L * 1024L * 1024L), "small file included");
         }
 
         private static FileEntry[] SampleFiles()

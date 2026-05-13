@@ -5,10 +5,17 @@ namespace WindowsDiskCleaner.App
     public sealed class CleanupCategoryCardViewModel
     {
         private readonly CleanupCategorySummary _summary;
+        private readonly bool _isActive;
 
         public CleanupCategoryCardViewModel(CleanupCategorySummary summary)
+            : this(summary, false)
+        {
+        }
+
+        public CleanupCategoryCardViewModel(CleanupCategorySummary summary, bool isActive)
         {
             _summary = summary;
+            _isActive = isActive;
         }
 
         public CleanupCategoryKind Kind
@@ -44,6 +51,16 @@ namespace WindowsDiskCleaner.App
         public string CountDisplay
         {
             get { return _summary.FileCount + " \u4e2a\u6587\u4ef6"; }
+        }
+
+        public bool IsActive
+        {
+            get { return _isActive; }
+        }
+
+        public string ActionText
+        {
+            get { return _isActive ? "\u5df2\u7b5b\u9009" : "\u70b9\u51fb\u7b5b\u9009"; }
         }
 
         public string IconText
@@ -90,6 +107,11 @@ namespace WindowsDiskCleaner.App
         {
             get
             {
+                if (_isActive)
+                {
+                    return "#dcfce7";
+                }
+
                 switch (_summary.Kind)
                 {
                     case CleanupCategoryKind.HighRisk:
@@ -101,9 +123,14 @@ namespace WindowsDiskCleaner.App
                     case CleanupCategoryKind.LargeFiles:
                         return "#fff7ed";
                     default:
-                        return "#f9fafb";
+                    return "#f9fafb";
                 }
             }
+        }
+
+        public string BorderHex
+        {
+            get { return _isActive ? AccentHex : "#e2e8f0"; }
         }
 
         private static string FormatSize(long bytes)

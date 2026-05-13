@@ -20,5 +20,7 @@ namespace WindowsDiskCleaner.Core
         public QuickFileFilter QuickFilter { get; set; }
 
         public FileRiskLevel? RiskLevel { get; set; }
+
+        public CleanupCategoryKind? CleanupCategory { get; set; }
     }
 }

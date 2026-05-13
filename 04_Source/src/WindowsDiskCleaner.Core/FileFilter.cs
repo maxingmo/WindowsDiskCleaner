@@ -58,6 +58,11 @@ namespace WindowsDiskCleaner.Core
                     continue;
                 }
 
+                if (options.CleanupCategory.HasValue && !MatchesCleanupCategory(file, options.CleanupCategory.Value))
+                {
+                    continue;
+                }
+
                 yield return file;
             }
         }
@@ -103,6 +108,27 @@ namespace WindowsDiskCleaner.Core
                     return InstallerExtensions.Contains(NormalizeExtension(file.Extension));
                 case QuickFileFilter.LogsAndTemporary:
                     return LogAndTemporaryExtensions.Contains(NormalizeExtension(file.Extension));
+                default:
+                    return true;
+            }
+        }
+
+        private bool MatchesCleanupCategory(FileEntry file, CleanupCategoryKind category)
+        {
+            var level = _riskClassifier.Classify(file).Level;
+
+            switch (category)
+            {
+                case CleanupCategoryKind.HighRisk:
+                    return level == FileRiskLevel.System || level == FileRiskLevel.ProgramInstall;
+                case CleanupCategoryKind.CacheTemporary:
+                    return level == FileRiskLevel.CacheTemporary;
+                case CleanupCategoryKind.UserData:
+                    return level == FileRiskLevel.UserData;
+                case CleanupCategoryKind.LargeFiles:
+                    return file.SizeBytes >= 100L * 1024L * 1024L;
+                case CleanupCategoryKind.UnknownCaution:
+                    return level == FileRiskLevel.UnknownCaution;
                 default:
                     return true;
             }

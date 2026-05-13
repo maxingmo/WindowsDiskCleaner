@@ -51,7 +51,7 @@ The cleanup category cards are summary cards only. They help you understand what
 - `大文件`: files at or above 100 MB. This category is for space analysis and may overlap with other categories.
 - `未知/谨慎`: files that do not match a clearer category.
 
-In P9B, clicking a card does not yet apply a filter or delete anything.
+Click a category card to filter the detailed results to that category. Click the same active card again to clear the category filter.
 
 ## Filters
 

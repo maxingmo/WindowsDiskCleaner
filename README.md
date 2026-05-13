@@ -43,6 +43,7 @@ The runnable prototype is currently published locally as:
   - User Data
   - Large Files
   - Unknown/Caution
+- Click cleanup category cards to filter detailed results by category.
 - Show selected-file risk details before deletion.
 - Delete a selected file or checked files to the Windows Recycle Bin.
 - Require an extra confirmation for system-level and program-install-level files.
@@ -61,6 +62,7 @@ Completed:
 - P8: Risk Visual Hints
 - P9A: Main UI Layout Refresh
 - P9B: Cleanup Home Inspired Layout
+- P10A: Category Filter and Folder View Polish
 
 Not yet implemented:
 
@@ -113,9 +115,10 @@ Run app:
 
 ## Latest Verified State
 
-- 35 core tests passed.
+- 37 core tests passed.
+- 2 app display tests passed.
 - App build verified and copied to `06_Build-Release\FileScannerP2.exe`.
-- Current title: `File Scanner P9B - Cleanup Home`.
+- Current title: `File Scanner P10A - UI Polish`.
 - See `00_Project-Management\CURRENT-STATE-HANDOFF.md` for the latest handoff snapshot.
 
 ## Next Steps

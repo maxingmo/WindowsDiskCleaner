@@ -12,7 +12,7 @@ namespace WindowsDiskCleaner.App
 
         public MainWindow()
         {
-            Title = "File Scanner P9B - Cleanup Home";
+            Title = "File Scanner P10A - UI Polish";
             Width = 1380;
             Height = 820;
             MinWidth = 1120;
@@ -278,14 +278,29 @@ namespace WindowsDiskCleaner.App
         {
             var template = new DataTemplate(typeof(CleanupCategoryCardViewModel));
 
+            var button = new FrameworkElementFactory(typeof(Button));
+            button.SetValue(Control.PaddingProperty, new Thickness(0));
+            button.SetValue(Control.BorderThicknessProperty, new Thickness(0));
+            button.SetValue(Control.BackgroundProperty, Brushes.Transparent);
+            button.SetValue(Control.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch);
+            button.SetValue(Control.VerticalContentAlignmentProperty, VerticalAlignment.Stretch);
+            button.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 12, 12));
+            button.SetBinding(Button.CommandProperty, new Binding("DataContext.SelectCleanupCategoryCommand")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(ItemsControl), 1)
+            });
+            button.SetBinding(Button.CommandParameterProperty, new Binding("Kind"));
+
             var border = new FrameworkElementFactory(typeof(Border));
             border.SetValue(Border.WidthProperty, 190D);
             border.SetValue(Border.MinHeightProperty, 118D);
-            border.SetValue(Border.MarginProperty, new Thickness(0, 0, 12, 12));
             border.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
             border.SetValue(Border.PaddingProperty, new Thickness(12));
             border.SetValue(Border.BorderThicknessProperty, new Thickness(1));
-            border.SetValue(Border.BorderBrushProperty, CreateBrush(226, 232, 240));
+            border.SetBinding(Border.BorderBrushProperty, new Binding("BorderHex")
+            {
+                Converter = HexBrushConverter
+            });
             border.SetBinding(Border.BackgroundProperty, new Binding("BackgroundHex")
             {
                 Converter = HexBrushConverter
@@ -349,8 +364,20 @@ namespace WindowsDiskCleaner.App
             desc.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 8, 0, 0));
             stack.AppendChild(desc);
 
+            var action = new FrameworkElementFactory(typeof(TextBlock));
+            action.SetBinding(TextBlock.TextProperty, new Binding("ActionText"));
+            action.SetBinding(TextBlock.ForegroundProperty, new Binding("AccentHex")
+            {
+                Converter = HexBrushConverter
+            });
+            action.SetValue(TextBlock.FontWeightProperty, FontWeights.SemiBold);
+            action.SetValue(TextBlock.FontSizeProperty, 11D);
+            action.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 8, 0, 0));
+            stack.AppendChild(action);
+
             border.AppendChild(stack);
-            template.VisualTree = border;
+            button.AppendChild(border);
+            template.VisualTree = button;
             return template;
         }
 
